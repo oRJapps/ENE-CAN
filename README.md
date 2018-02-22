@@ -1,6 +1,6 @@
 # ENE-CAN（ENE*CAN）
 ## About ENE-CAN
-Mob Killer Count uses TalesWeaver 's Chatlog to calculate the amount of the monster' s subjugation, the total acquisition experience, and the acquisition experience value of 1 hour since the hunt started with a file drop.  
+ENE*CAN uses TalesWeaver 's Chatlog to calculate the amount of the monster' s subjugation, the total acquisition experience, and the acquisition experience value of 1 hour since the hunt started with a file drop.  
 The copyright of TalesWeaver is located in NEXON CORPORATION, and this project has nothing to do with NEXON.
 
 ## Usage
