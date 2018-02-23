@@ -39,7 +39,6 @@ $("#drop-area").on("drop", function (e) {
 
         for (var i = 0; i < str.length; i++) {
             last = (str.length) - 1;
-            console.log(last)
             strArray[i] = str[i];
             //console.log("i:" + i + " strArray:" + strArray[i]);
 
@@ -47,15 +46,14 @@ $("#drop-area").on("drop", function (e) {
             if (strArray[i].indexOf("時") > 0 && strArray[i].indexOf("分") > 0) {
                 if (firstlog) {
                     play = i;
-                    
                     firstlog = false;
                 }
                 //プレイ時間ラスト取得
-                if (i == last) {
-                    last = i;
-                    
-                }
+                last = i;
 
+            }
+            if(strArray[last]==""){
+                last = i - 1;
             }
             if (strArray[i].indexOf("経験値が") > 0) {
                 if (strArray[i].indexOf("ルーン経験値が") > 0) {
@@ -82,15 +80,15 @@ $("#drop-area").on("drop", function (e) {
         }
         firstPlayTime = new Date(oneDay.getFullYear(), oneDay.getMonth(), oneDay.getDate(), parseInt(strArray[play].substring(strArray[play].indexOf("[") + 1, strArray[play].indexOf("時")), 10), parseInt(strArray[play].substring(strArray[play].indexOf("時") + 1, strArray[play].indexOf("分")), 10), parseInt(strArray[play].substring(strArray[play].indexOf("分") + 1, strArray[play].indexOf("秒")), 10));
 
-        
+
 
         lastPlayTime = new Date(oneDay.getFullYear(), oneDay.getMonth(), oneDay.getDate(), parseInt(strArray[last].substring(strArray[last].indexOf("[") + 1, strArray[last].indexOf("時")), 10), parseInt(strArray[last].substring(strArray[last].indexOf("時") + 1, strArray[last].indexOf("分")), 10), parseInt(strArray[last].substring(strArray[last].indexOf("分") + 1, strArray[last].indexOf("秒")), 10));
-        
 
-        var playTimeTotal = lastPlayTime-firstPlayTime;
+
+        var playTimeTotal = lastPlayTime - firstPlayTime;
         var h = String(Math.floor(playTimeTotal / 3600000) + 100).substring(1);
-        var m = String(Math.floor((playTimeTotal - h * 3600000)/60000)+ 100).substring(1);
-        var s = String(Math.round((playTimeTotal - h * 3600000 - m * 60000)/1000)+ 100).substring(1);
+        var m = String(Math.floor((playTimeTotal - h * 3600000) / 60000) + 100).substring(1);
+        var s = String(Math.round((playTimeTotal - h * 3600000 - m * 60000) / 1000) + 100).substring(1);
 
 
         $("#result").html("MOB討伐数は<span>" + String(mobCount).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,') + "</span>匹です");
