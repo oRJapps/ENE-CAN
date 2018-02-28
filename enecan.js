@@ -52,7 +52,7 @@ $("#drop-area").on("drop", function (e) {
                 last = i;
 
             }
-            if(strArray[last]==""){
+            if (strArray[last] == "") {
                 last = i - 1;
             }
             if (strArray[i].indexOf("経験値が") > 0) {
@@ -96,6 +96,13 @@ $("#drop-area").on("drop", function (e) {
         $("#exp").html("総取得経験値は、" + String(total).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,') + "expです<br>狩りをはじめてから１時間の取得経験値は、" +
             String(all).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,') + "expです");
         $("span").attr("id", "count");
+        $("#ss").html('<center><a href="#" id="btn">スクリーンショットをダウンロードする</a></center>');
+        html2canvas($("#ss-area"), {
+            onrendered: function (canvas) {
+                $("#btn").attr("download", "enecan.png").attr("href", canvas.toDataURL("image/png"));
+            }
+        });
+
     };
     reader.readAsText(file, "SJIS");
 });
@@ -103,3 +110,24 @@ $("#drop-area").on("drop", function (e) {
 $("#drop-area").on("dragover", function (e) {
     e.preventDefault();
 });
+
+/*var element = $("#ss-area"); // 画像化したい要素をセレクタに指定
+var getCanvas; 
+  
+    //プレビュー
+    $("#ss").on('click', function () {
+         html2canvas($("#ss-area"), {
+         onrendered: function (canvas) {
+               $("#btn").attr("download", "enecan.png").attr("href", canvas.toDataURL("image/png"));
+             }
+         });
+    });
+ 
+    // コンバートしてダウンロード
+ /* $("a#btn").on('click', function () {
+    var imgageData = getCanvas.toDataURL("image/png");
+    var newData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
+    //ファイル名を設定
+    $("a#btn").attr("download", "enecan.png").attr("href", newData);
+  }); 
+*/
