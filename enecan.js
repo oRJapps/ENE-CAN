@@ -96,10 +96,15 @@ $("#drop-area").on("drop", function (e) {
         $("#exp").html("総取得経験値は、" + String(total).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,') + "expです<br>狩りをはじめてから１時間の取得経験値は、" +
             String(all).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,') + "expです");
         $("span").attr("id", "count");
-        $("#ss").html('<center><a href="#" id="btn">スクリーンショットをダウンロードする</a></center>');
+        $("#ss").html('<center><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="btn">画像プレビュー</button></center>');
         html2canvas($("#ss-area"), {
             onrendered: function (canvas) {
-                $("#btn").attr("download", "enecan.png").attr("href", canvas.toDataURL("image/png"));
+                //$("#img").append(canvas);
+                var img = new Image();
+                img.src = canvas.toDataURL("image/png");
+                img.width = 450;
+                document.getElementsByClassName('modal-body')[0].appendChild(img);
+                //$("#btn-ss").attr("download", "enecan.png").attr("href", canvas.toDataURL("image/png"));
             }
         });
 
