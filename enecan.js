@@ -56,7 +56,14 @@ $("#drop-area").on("drop", function (e) {
                 last = i - 1;
             }
             if (strArray[i].indexOf("経験値が") > 0) {
+                //以下の条件の場合は読み飛ばす
                 if (strArray[i].indexOf("ルーン経験値が") > 0) {
+                    continue;
+                }
+                if (strArray[i].indexOf("修練の石") > 0) {
+                    continue;
+                }
+                if (strArray[i].indexOf("レベルアップ") > 0) {
                     continue;
                 }
                 mobCount += 1;
