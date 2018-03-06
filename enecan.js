@@ -103,15 +103,23 @@ $("#drop-area").on("drop", function (e) {
         $("#exp").html("総取得経験値は、" + String(total).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,') + "expです<br>狩りをはじめてから１時間の取得経験値は、" +
             String(all).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,') + "expです");
         $("span").attr("id", "count");
-        $("#ss").html('<center><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="btn">画像プレビュー</button></center>');
+        $("#ss").html('<center><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="btn">スクリーンショットを撮る</button></center>');
         html2canvas($("#ss-area"), {
             onrendered: function (canvas) {
-                //$("#img").append(canvas);
                 var img = new Image();
                 img.src = canvas.toDataURL("image/png");
                 img.width = 450;
                 document.getElementsByClassName('modal-body')[0].appendChild(img);
-                //$("#btn-ss").attr("download", "enecan.png").attr("href", canvas.toDataURL("image/png"));
+                $('#save').on('click', function (e) {
+                    if (confirm("スクリーンショットをenecan.pngで保存します。\nサイズ：幅はブラウザの幅に変動、高さは356pxになります。")) {
+                        $(e.target).attr("download", "enecan.png").attr("href", img.src);
+                    } else {
+                        return false;
+                    }
+
+
+                });
+
             }
         });
 
@@ -122,24 +130,3 @@ $("#drop-area").on("drop", function (e) {
 $("#drop-area").on("dragover", function (e) {
     e.preventDefault();
 });
-
-/*var element = $("#ss-area"); // 画像化したい要素をセレクタに指定
-var getCanvas; 
-  
-    //プレビュー
-    $("#ss").on('click', function () {
-         html2canvas($("#ss-area"), {
-         onrendered: function (canvas) {
-               $("#btn").attr("download", "enecan.png").attr("href", canvas.toDataURL("image/png"));
-             }
-         });
-    });
- 
-    // コンバートしてダウンロード
- /* $("a#btn").on('click', function () {
-    var imgageData = getCanvas.toDataURL("image/png");
-    var newData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
-    //ファイル名を設定
-    $("a#btn").attr("download", "enecan.png").attr("href", newData);
-  }); 
-*/
