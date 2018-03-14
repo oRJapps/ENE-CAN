@@ -8,6 +8,17 @@
         $dbh = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD, $options);
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         echo "状態：アイテム登録ができます";
+
+        //テーブル表示用SQL-露店
+        $sql_roten = 'SELECT * FROM items WHERE buyspot ="露店"';
+        $stmt_roten = $dbh -> query($sql_roten);
+
+        //テーブル表示用SQL-NP
+        $sql_np = 'SELECT * FROM items WHERE buyspot ="TOM"';
+        $stmt_np = $dbh -> query($sql_np);
+
+
+
     } catch (PDOException $e) {
         echo $e->getMessage();
         exit;
@@ -29,7 +40,11 @@
 
         <h1>エネルギッシュな缶詰</h1>
         <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
-        <p>アイテムがない場合は、<a href="#">こちら</a>から登録できます。</p>
+        <p>アイテムがない場合は、
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                こちら
+            </button>から登録できます。</p>
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
@@ -52,7 +67,8 @@
                 <div class="row">
                     <div class="col-3">
                     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                        <a class="nav-link active" id="v-pills-sw-tab" data-toggle="pill" href="#v-pills-sw" role="tab" aria-controls="v-pills-sw" aria-selected="true">共通スキルSW</a>
+                        <a class="nav-link active" id="v-pills-all-tab" data-toggle="pill" href="#v-pills-all" role="tab" aria-controls="v-pills-all" aria-selected="true">All</a>
+                        <a class="nav-link" id="v-pills-sw-tab" data-toggle="pill" href="#v-pills-sw" role="tab" aria-controls="v-pills-sw" aria-selected="true">共通スキルSW</a>
                         <a class="nav-link" id="v-pills-pa-tab" data-toggle="pill" href="#v-pills-pa" role="tab" aria-controls="v-pills-pa" aria-selected="false">共通スキルPA</a>
                         <a class="nav-link" id="v-pills-eb-tab" data-toggle="pill" href="#v-pills-eb" role="tab" aria-controls="v-pills-eb" aria-selected="false">共通スキルEB</a>
                         <a class="nav-link" id="v-pills-ea-tab" data-toggle="pill" href="#v-pills-ea" role="tab" aria-controls="v-pills-ea" aria-selected="false">共通スキルEA</a>
@@ -60,7 +76,32 @@
                     </div>
                     <div class="col-9">
                         <div class="tab-content" id="v-pills-tabContent">
-                            <div class="tab-pane fade show active" id="v-pills-sw" role="tabpanel" aria-labelledby="v-pills-sw-tab">
+                            <div class="tab-pane fade show active" id="v-pills-all" role="tabpanel" aria-labelledby="v-pills-all-tab">
+                             <!--OMDBテーブル-->
+                             <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                    <th scope="col">id</th>
+                                    <th scope="col">サーバ名</th>
+                                    <th scope="col">アイテム名</th>
+                                    <th scope="col">価格</th>
+                                    <th scope="col">日付</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <?php while($result = $stmt_np->fetch(PDO::FETCH_ASSOC)){ ?>
+                                            <th scope="row"><?php echo $result['id']; ?></th>
+                                            <td><?php echo $result['server']; ?></td>
+                                            <td><?php echo $result['item']; ?></td>
+                                            <td><?php echo $result['price']; ?></td>
+                                            <td><?php echo $result['date']; ?></td>
+                                        <?php } ?>
+                                    </tr>
+                                </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade" id="v-pills-sw" role="tabpanel" aria-labelledby="v-pills-sw-tab">
                             <p>SW</p>
                             </div>
                             <div class="tab-pane fade" id="v-pills-pa" role="tabpanel" aria-labelledby="v-pills-pa-tab">
@@ -76,6 +117,80 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <!--登録モーダルウィンドウ-->
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">アイテム登録ウィンドウ</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                アイテムを登録します。
+                <form>
+                    <!--server -->
+                    <div class="form-group row">
+                        <label for="server" class="col-sm-2 col-form-label">サーバ</label>
+                        <div class="col-sm-10">
+                        <select id="inputserver" class="form-control">
+                            <option selected>ローゼンバーグ</option>
+                            <option>エルフィンタ</option>
+                            <option>ミストラル</option>
+                            <option>ゼルナ</option>
+                            <option>モエン</option>
+                        </select>
+                        </div>
+                    </div>
+                     <!--item -->
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-sm-2 col-form-label">アイテム名</label>
+                        <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputitem" placeholder="正式名称で入力：ゲシュ⇒ゲシュタルトの破片">
+                        </div>
+                    </div>
+                    <!-- price -->
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-sm-2 col-form-label">価格</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputnumber" placeholder="価格を入力。kとmと入力しても自動で0を追加します">
+                        </div>
+                    </div>
+                    <!-- buyspot  -->
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-sm-2 col-form-label">売場</label>
+                        <div class="col-sm-10">
+                            <select id="inputbuyspot" class="form-control">
+                                <option selected>露店</option>
+                                <option>OM(=TOM)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- buyname  -->
+                    <div class="form-group row">
+                        <label for="inputbuyname" class="col-sm-2 col-form-label">販売者名</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputbuyname" placeholder="販売者名をキャラクター名で入力">
+                        </div>
+                    </div>
+                    <!-- date  -->
+                    <div class="form-group row">
+                        <label for="inputbuyname" class="col-sm-2 col-form-label">日付</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputbuyname" placeholder="露店の場合は登録した日付をOMの場合は掲載期限の日付を登録してください">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+            </div>
+        </div>
         </div>
     </body>
 </html>
