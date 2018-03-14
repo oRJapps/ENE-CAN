@@ -1,6 +1,4 @@
 <?php
-    session_start();
-
     require('connect.php');
 
     // データベースの接続
@@ -40,11 +38,7 @@
 
         <h1>エネルギッシュな缶詰</h1>
         <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
-        <p>アイテムがない場合は、
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                こちら
-            </button>から登録できます。</p>
+        <p>アイテムがない場合は、<a href="newitem.php">こちら</a>から登録できます。</p>
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
@@ -117,80 +111,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <!--登録モーダルウィンドウ-->
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">アイテム登録ウィンドウ</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                アイテムを登録します。
-                <form>
-                    <!--server -->
-                    <div class="form-group row">
-                        <label for="server" class="col-sm-2 col-form-label">サーバ</label>
-                        <div class="col-sm-10">
-                        <select id="inputserver" class="form-control">
-                            <option selected>ローゼンバーグ</option>
-                            <option>エルフィンタ</option>
-                            <option>ミストラル</option>
-                            <option>ゼルナ</option>
-                            <option>モエン</option>
-                        </select>
-                        </div>
-                    </div>
-                     <!--item -->
-                    <div class="form-group row">
-                        <label for="inputPassword" class="col-sm-2 col-form-label">アイテム名</label>
-                        <div class="col-sm-10">
-                        <input type="text" class="form-control" id="inputitem" placeholder="正式名称で入力：ゲシュ⇒ゲシュタルトの破片">
-                        </div>
-                    </div>
-                    <!-- price -->
-                    <div class="form-group row">
-                        <label for="inputPassword" class="col-sm-2 col-form-label">価格</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputnumber" placeholder="価格を入力。kとmと入力しても自動で0を追加します">
-                        </div>
-                    </div>
-                    <!-- buyspot  -->
-                    <div class="form-group row">
-                        <label for="inputPassword" class="col-sm-2 col-form-label">売場</label>
-                        <div class="col-sm-10">
-                            <select id="inputbuyspot" class="form-control">
-                                <option selected>露店</option>
-                                <option>OM(=TOM)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- buyname  -->
-                    <div class="form-group row">
-                        <label for="inputbuyname" class="col-sm-2 col-form-label">販売者名</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputbuyname" placeholder="販売者名をキャラクター名で入力">
-                        </div>
-                    </div>
-                    <!-- date  -->
-                    <div class="form-group row">
-                        <label for="inputbuyname" class="col-sm-2 col-form-label">日付</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputbuyname" placeholder="露店の場合は登録した日付をOMの場合は掲載期限の日付を登録してください">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-            </div>
-        </div>
         </div>
     </body>
 </html>
