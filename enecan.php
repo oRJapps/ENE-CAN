@@ -1,5 +1,18 @@
 <?php
-echo "Hello,World";
+    session_start();
+
+    require('connect.php');
+
+    // データベースの接続
+    try {
+        $dbh = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD, $options);
+        $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        echo "状態：アイテム登録ができます";
+    } catch (PDOException $e) {
+        echo $e->getMessage();
+        exit;
+    }
+
 
 ?>
 
