@@ -5,23 +5,10 @@
 
     // データベースの接続
     try {
-        $dbh = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD, $options);
+        $dbh = new PDO('mysql:host='.DB_HOST.';charset=utf8;dbname='.DB_NAME, DB_USER, DB_PASSWORD, $options);
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-
-        //form登録
-        /*$stmt = $dbh ->prepare("INSERT INTO items (server,item,buyspot,buyname,price,date) VALUES (:server, :item,:buyspot,:buyname,:price,:date)");
-        $stmt->bindValue(':server', $_SESSION['server'], PDO::PARAM_STR);
-        $stmt->bindValue(':item', $_SESSION['item'], PDO::PARAM_STR);
-        $stmt->bindValue(':buyspot', $_SESSION['buyspot'], PDO::PARAM_STR);
-        $stmt->bindValue(':buyname', $_SESSION['buyname'], PDO::PARAM_STR);
-        $stmt->bindValue(':price', $_SESSION['price'], PDO::PARAM_INT);
-
-        $date = new Date($_SESSION['date']);
-        $stmt->bindValue(':date', $date->format('Y-m-d'), PDO::PARAM_STR);
-    
-        $stmt->execute();
-        */
+        
+        
         // 変数の初期化
         $page_flag = 0;
 
@@ -42,6 +29,21 @@
             $_SESSION['buyname'] =htmlspecialchars($_POST['buyname'], ENT_QUOTES, "UTF-8");
             $_SESSION['price'] =htmlspecialchars($_POST['price'], ENT_QUOTES, "UTF-8");
             $_SESSION['date'] =htmlspecialchars($_POST['date'], ENT_QUOTES, "UTF-8");
+        }elseif(isset($_POST['btn_submit'])){
+            //form登録
+            //$sql = "INSERT INTO items (item,server,buyspot,buyname,price,date) VALUES (?,?,?,?,?,?)";
+            $sql = "INSERT INTO items (item,server,buyspot,buyname,price,date) VALUES (?,?,?,?,?,?)";
+            $stmt = $dbh -> query("SET NAMES utf8;");
+            $stmt = $dbh ->prepare($sql);
+            $stmt->bindValue(1, $_SESSION['item'], PDO::PARAM_STR);
+            $stmt->bindValue(2, $_SESSION['server'], PDO::PARAM_STR);
+            $stmt->bindValue(3, $_SESSION['buyspot'], PDO::PARAM_STR);
+            $stmt->bindValue(4, $_SESSION['buyname'], PDO::PARAM_STR);
+            $stmt->bindValue(5, $_SESSION['price'], PDO::PARAM_INT);
+            $stmt->bindValue(6, date("Y-m-d",strtotime($_SESSION['date'])));
+            
+            $stmt->execute();
+            session_destroy();
         }
 
 
@@ -113,6 +115,7 @@ label {
 
 
 </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
@@ -181,6 +184,9 @@ label {
                 <input type="hidden" name="date" value="<?php echo $_SESSION['date']; ?>">
                 
             </form>
+        <?php elseif( $page_flag === 2 ): ?>
+        <h1>エネルギッシュな缶詰-登録完了フォーム-</h1>
+            <p>登録が完了しました</p>
         <?php else: ?>
         <h1>エネルギッシュな缶詰-登録フォーム-</h1>
                 <form method="POST">
