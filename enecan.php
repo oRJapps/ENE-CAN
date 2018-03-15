@@ -60,13 +60,14 @@
                 NP
                 <div class="row">
                     <div class="col-3">
-                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                        <a class="nav-link active" id="v-pills-all-tab" data-toggle="pill" href="#v-pills-all" role="tab" aria-controls="v-pills-all" aria-selected="true">All</a>
-                        <a class="nav-link" id="v-pills-sw-tab" data-toggle="pill" href="#v-pills-sw" role="tab" aria-controls="v-pills-sw" aria-selected="true">共通スキルSW</a>
-                        <a class="nav-link" id="v-pills-pa-tab" data-toggle="pill" href="#v-pills-pa" role="tab" aria-controls="v-pills-pa" aria-selected="false">共通スキルPA</a>
-                        <a class="nav-link" id="v-pills-eb-tab" data-toggle="pill" href="#v-pills-eb" role="tab" aria-controls="v-pills-eb" aria-selected="false">共通スキルEB</a>
-                        <a class="nav-link" id="v-pills-ea-tab" data-toggle="pill" href="#v-pills-ea" role="tab" aria-controls="v-pills-ea" aria-selected="false">共通スキルEA</a>
-                    </div>
+                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                            <a class="nav-link active" id="v-pills-all-tab" data-toggle="pill" href="#v-pills-all" role="tab" aria-controls="v-pills-all" aria-selected="true">All</a>
+                            <共通スキル>
+                            <a class="nav-link" id="v-pills-sw-tab" data-toggle="pill" href="#v-pills-sw" role="tab" aria-controls="v-pills-sw" aria-selected="true">共通スキルSW</a>
+                            <a class="nav-link" id="v-pills-pa-tab" data-toggle="pill" href="#v-pills-pa" role="tab" aria-controls="v-pills-pa" aria-selected="false">共通スキルPA</a>
+                            <a class="nav-link" id="v-pills-eb-tab" data-toggle="pill" href="#v-pills-eb" role="tab" aria-controls="v-pills-eb" aria-selected="false">共通スキルEB</a>
+                            <a class="nav-link" id="v-pills-ea-tab" data-toggle="pill" href="#v-pills-ea" role="tab" aria-controls="v-pills-ea" aria-selected="false">共通スキルEA</a>
+                        </div>
                     </div>
                     <div class="col-9">
                         <div class="tab-content" id="v-pills-tabContent">
