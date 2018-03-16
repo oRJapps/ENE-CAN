@@ -8,13 +8,71 @@
         echo "状態：アイテム登録ができます";
 
         //テーブル表示用SQL-露店
+        
         $sql_roten = 'SELECT * FROM items WHERE buyspot ="露店"';
+        $stmt_roten = $dbh -> query("SET NAMES utf8;");
         $stmt_roten = $dbh -> query($sql_roten);
 
-        //テーブル表示用SQL-NP
+        //テーブル表示用SQL-NP-ALL
+        
         $sql_np = 'SELECT * FROM items WHERE buyspot ="TOM"';
         $stmt_np = $dbh -> query($sql_np);
 
+       //共通スキル 
+        $sql_sw = 'SELECT * FROM items WHERE item LIKE "%ストロングウェポン%"';
+        $stmt_sw = $dbh -> query("SET NAMES utf8;");
+        $stmt_sw = $dbh -> query($sql_sw);
+
+        $sql_pa = 'SELECT * FROM items WHERE item LIKE "%プロテクトアーマー%"';
+        $stmt_pa = $dbh -> query("SET NAMES utf8;");
+        $stmt_pa = $dbh -> query($sql_pa);
+
+        $sql_eb = 'SELECT * FROM items WHERE item LIKE "%エレメンタルブレイク%"';
+        $stmt_eb = $dbh -> query("SET NAMES utf8;");
+        $stmt_eb = $dbh -> query($sql_eb);
+
+        $sql_ea = 'SELECT * FROM items WHERE item LIKE "%エクストリームアタック%"';
+        $stmt_ea = $dbh -> query("SET NAMES utf8;");
+        $stmt_ea = $dbh -> query($sql_ea);
+
+        $sql_pw = 'SELECT * FROM items WHERE item LIKE "%パワーウェポン%"';
+        $stmt_pw = $dbh -> query("SET NAMES utf8;");
+        $stmt_pw = $dbh -> query($sql_pw);
+
+        $sql_ca = 'SELECT * FROM items WHERE item LIKE "%コートアーマー%"';
+        $stmt_ca = $dbh -> query("SET NAMES utf8;");
+        $stmt_ca = $dbh -> query($sql_ca);
+
+        $sql_ha = 'SELECT * FROM items WHERE item LIKE "%ハイパーアタック%"';
+        $stmt_ha = $dbh -> query("SET NAMES utf8;");
+        $stmt_ha = $dbh -> query($sql_ha);
+
+        $sql_ih = 'SELECT * FROM items WHERE item LIKE "%アイアンハート%"';
+        $stmt_ih = $dbh -> query("SET NAMES utf8;");
+        $stmt_ih = $dbh -> query($sql_ih);
+
+        //二次覚醒素材
+        $sql_geshu = 'SELECT * FROM items WHERE item ="ゲシュタルトの破片"';
+        $stmt_geshu = $dbh -> query("SET NAMES utf8;");
+        $stmt_geshu = $dbh -> query($sql_geshu);
+
+        $sql_hen = 'SELECT * FROM items WHERE item ="変質したコア"';
+        $stmt_hen = $dbh -> query("SET NAMES utf8;");
+        $stmt_hen = $dbh -> query($sql_hen);
+
+        //三次覚醒素材
+        $sql_namida = 'SELECT * FROM items WHERE item ="精霊の涙"';
+        $stmt_namida = $dbh -> query("SET NAMES utf8;");
+        $stmt_namida = $dbh -> query($sql_namida);
+
+        $sql_tamashi = 'SELECT * FROM items WHERE item ="精霊の魂"';
+        $stmt_tamashi = $dbh -> query("SET NAMES utf8;");
+        $stmt_tamashi = $dbh -> query($sql_tamashi);
+
+        $sql_dango = 'SELECT * FROM items WHERE item ="黄金団子"';
+        $stmt_dango = $dbh -> query("SET NAMES utf8;");
+        $stmt_dango = $dbh -> query($sql_dango);
+        
 
 
     } catch (PDOException $e) {
@@ -40,7 +98,7 @@
         <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
         <p>アイテムがない場合は、<a href="newitem.php">こちら</a>から登録できます。</p>
 
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="seed-tab" data-toggle="tab" href="#seed" role="tab" aria-controls="seed-tab" aria-selected="true">露店（ゲーム内通貨）</a>
             </li>
@@ -52,26 +110,44 @@
         <div class="tab-content" id="myTabContent">
             <!--露店テーブル-->
             <div class="tab-pane fade show active" id="seed" role="tabpanel" aria-labelledby="seed-tab">
-              露店 
+                <p>ゲーム内通貨SEEDで販売されているアイテムです。</p> 
+                <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                    <th scope="col">id</th>
+                                    <th scope="col">サーバ名</th>
+                                    <th scope="col">アイテム名</th>
+                                    <th scope="col">価格</th>
+                                    <th scope="col">日付</th>
+                                    </tr>
+                                </thead>
+                    <tbody>
+                        
+                        <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)){ ?>
+                            <tr>
+                                <th scope="col"><?php echo $result['id']; ?></th>
+                                <td><?php echo $result['server']; ?></td>
+                                <td><?php echo $result['item']; ?></td>
+                                <td align="justify"><?php 
+                                    if($result['buyspot']=="露店"){
+                                        echo number_format($result['price'])."seed";
+                                    }else{
+                                        echo number_format($result['price'])."NP";
+                                    }
+                                    ?>
+                                </td>
+                                <td><?php echo $result['date']; ?></td>
+                            </tr>
+                        <?php } ?>
+                        
+                    </tbody>
+                </table>
+                
+            
             </div>
-
              <!--OMテーブル-->
             <div class="tab-pane fade" id="np" role="tabpanel" aria-labelledby="np-tab">
-                NP
-                <div class="row">
-                    <div class="col-3">
-                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                            <a class="nav-link active" id="v-pills-all-tab" data-toggle="pill" href="#v-pills-all" role="tab" aria-controls="v-pills-all" aria-selected="true">All</a>
-                            <共通スキル>
-                            <a class="nav-link" id="v-pills-sw-tab" data-toggle="pill" href="#v-pills-sw" role="tab" aria-controls="v-pills-sw" aria-selected="true">共通スキルSW</a>
-                            <a class="nav-link" id="v-pills-pa-tab" data-toggle="pill" href="#v-pills-pa" role="tab" aria-controls="v-pills-pa" aria-selected="false">共通スキルPA</a>
-                            <a class="nav-link" id="v-pills-eb-tab" data-toggle="pill" href="#v-pills-eb" role="tab" aria-controls="v-pills-eb" aria-selected="false">共通スキルEB</a>
-                            <a class="nav-link" id="v-pills-ea-tab" data-toggle="pill" href="#v-pills-ea" role="tab" aria-controls="v-pills-ea" aria-selected="false">共通スキルEA</a>
-                        </div>
-                    </div>
-                    <div class="col-9">
-                        <div class="tab-content" id="v-pills-tabContent">
-                            <div class="tab-pane fade show active" id="v-pills-all" role="tabpanel" aria-labelledby="v-pills-all-tab">
+                <p>OMで販売されている商品一覧です。1NP=1円換算になります。</p>
                              <!--OMDBテーブル-->
                              <table class="table table-hover">
                                 <thead>
@@ -85,32 +161,23 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <?php while($result = $stmt_np->fetch(PDO::FETCH_ASSOC)){ ?>
+                                        <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)){ ?>
                                             <th scope="row"><?php echo $result['id']; ?></th>
                                             <td><?php echo $result['server']; ?></td>
                                             <td><?php echo $result['item']; ?></td>
-                                            <td><?php echo $result['price']; ?></td>
+                                            <td><?php 
+                                                    if($result['buyspot']=="露店"){
+                                                        echo number_format($result['price'])."seed";
+                                                    }else{
+                                                        echo number_format($result['price'])."NP";
+                                                    }
+                                                 ?>
+                                            </td>
                                             <td><?php echo $result['date']; ?></td>
                                         <?php } ?>
                                     </tr>
                                 </tbody>
-                                </table>
-                            </div>
-                            <div class="tab-pane fade" id="v-pills-sw" role="tabpanel" aria-labelledby="v-pills-sw-tab">
-                            <p>SW</p>
-                            </div>
-                            <div class="tab-pane fade" id="v-pills-pa" role="tabpanel" aria-labelledby="v-pills-pa-tab">
-                            <p>PA</p>
-                            </div>
-                            <div class="tab-pane fade" id="v-pills-eb" role="tabpanel" aria-labelledby="v-pills-eb-tab">
-                            <p>EB</p>
-                            </div>
-                            <div class="tab-pane fade" id="v-pills-ea" role="tabpanel" aria-labelledby="v-pills-ea-tab">
-                            <p>EA</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                             </table>   
             </div>
         </div>
     </body>

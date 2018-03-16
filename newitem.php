@@ -27,11 +27,18 @@
             $_SESSION['item'] =htmlspecialchars($_POST['item'], ENT_QUOTES, "UTF-8");
             $_SESSION['buyspot']=htmlspecialchars($_POST['buyspot'], ENT_QUOTES, "UTF-8");
             $_SESSION['buyname'] =htmlspecialchars($_POST['buyname'], ENT_QUOTES, "UTF-8");
+            
+            //kとm入力に限り0を自動追加
+            if(strpos($_POST['price'],'m') !== false || strpos($_POST['price'],'M') !== false){
+                $_POST['price'] = intval($_POST['price'])*1000*1000;
+            }elseif(strpos($_POST['price'],'k') !== false || strpos($_POST['price'],'K') !== false){
+                $_POST['price'] = intval($_POST['price'])*1000;
+            }
             $_SESSION['price'] =htmlspecialchars($_POST['price'], ENT_QUOTES, "UTF-8");
+            
             $_SESSION['date'] =htmlspecialchars($_POST['date'], ENT_QUOTES, "UTF-8");
         }elseif(isset($_POST['btn_submit'])){
             //form登録
-            //$sql = "INSERT INTO items (item,server,buyspot,buyname,price,date) VALUES (?,?,?,?,?,?)";
             $sql = "INSERT INTO items (item,server,buyspot,buyname,price,date) VALUES (?,?,?,?,?,?)";
             $stmt = $dbh -> query("SET NAMES utf8;");
             $stmt = $dbh ->prepare($sql);
@@ -43,7 +50,17 @@
             $stmt->bindValue(6, date("Y-m-d",strtotime($_SESSION['date'])));
             
             $stmt->execute();
+           
+            
+            $_POST['server']=null;
+            $_POST['item']=null;
+            $_POST['buyspot']=null;
+            $_POST['buyname']=null;
+            $_POST['price']=null;
+            $_POST['date']=null;
+
             session_destroy();
+            
         }
 
 
@@ -185,8 +202,9 @@ label {
                 
             </form>
         <?php elseif( $page_flag === 2 ): ?>
-        <h1>エネルギッシュな缶詰-登録完了フォーム-</h1>
+        <h1>エネルギッシュな缶詰(β)-登録完了フォーム-</h1>
             <p>登録が完了しました</p>
+            <p><a href="enecan.php">TOPページへ戻る</a> | <a href="newitem.php">続けて登録する</a></p>
         <?php else: ?>
         <h1>エネルギッシュな缶詰-登録フォーム-</h1>
                 <form method="POST">
