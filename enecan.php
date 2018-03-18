@@ -83,102 +83,155 @@
 
 ?>
 
-<!DOCTYPE html>
-<html>
+    <!DOCTYPE html>
+    <html>
+
     <head>
         <title>エネルギッシュな缶詰</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="./css/style.css">
+
     </head>
+
     <body>
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-        <h1>エネルギッシュな缶詰</h1>
-        <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
-        <p>アイテムがない場合は、<a href="newitem.php">こちら</a>から登録できます。</p>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+            <a class="navbar-brand" href="index.html">ENE*CAN</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria- controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-        <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="seed-tab" data-toggle="tab" href="#seed" role="tab" aria-controls="seed-tab" aria-selected="true">露店（ゲーム内通貨）</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="np-tab" data-toggle="tab" href="#np" role="tab" aria-controls="np-tab" aria-selected="false">OM（NP=ネクソンポイント）</a>
-            </li>
-        </ul>
-        
-        <div class="tab-content" id="myTabContent">
-            <!--露店テーブル-->
-            <div class="tab-pane fade show active" id="seed" role="tabpanel" aria-labelledby="seed-tab">
-                <p>ゲーム内通貨SEEDで販売されているアイテムです。</p> 
-                <table class="table table-hover">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="ene-can.html">Enemy Killer Count</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="enecan.php">エネルギッシュな缶詰</a>
+                    </li>
+
+                </ul>
+
+            </div>
+        </nav>
+        <div class="clear">
+            <div class="layerTransparent" >
+
+                <div id="enecan">
+                    <h1>エネルギッシュな缶詰</h1>
+                    <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
+                    <p>アイテムがない場合は、<a href="newitem.php">こちら</a>から登録できます。</p>
+
+                    <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="seed-tab" data-toggle="tab" href="#seed" role="tab" aria-controls="seed-tab" aria-selected="true">露店（ゲーム内通貨）</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="np-tab" data-toggle="tab" href="#np" role="tab" aria-controls="np-tab" aria-selected="false">OM（NP=ネクソンポイント）</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="myTabContent">
+                        <!--露店テーブル-->
+                        <div class="tab-pane fade show active" id="seed" role="tabpanel" aria-labelledby="seed-tab">
+                            <p>ゲーム内通貨SEEDで販売されているアイテムです。</p>
+                            <table class="table table-hover table--hen">
                                 <thead>
                                     <tr>
-                                    <th scope="col">id</th>
-                                    <th scope="col">サーバ名</th>
-                                    <th scope="col">アイテム名</th>
-                                    <th scope="col">価格</th>
-                                    <th scope="col">日付</th>
+                                        <th scope="col">サーバ名</th>
+                                        <th scope="col">アイテム名</th>
+                                        <th scope="col">価格</th>
+                                        <th scope="col">日付</th>
                                     </tr>
                                 </thead>
-                    <tbody>
-                        
-                        <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)){ ?>
-                            <tr>
-                                <th scope="col"><?php echo $result['id']; ?></th>
-                                <td><?php echo $result['server']; ?></td>
-                                <td><?php echo $result['item']; ?></td>
-                                <td align="justify"><?php 
+                                <tbody>
+
+                                    <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)){ ?>
+                                    <tr>
+                                        
+                                        <td>
+                                            <?php echo $result['server']; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo $result['item']; ?>
+                                        </td>
+                                        <td>
+                                            <?php 
                                     if($result['buyspot']=="露店"){
                                         echo number_format($result['price'])."seed";
                                     }else{
                                         echo number_format($result['price'])."NP";
                                     }
                                     ?>
-                                </td>
-                                <td><?php echo $result['date']; ?></td>
-                            </tr>
-                        <?php } ?>
-                        
-                    </tbody>
-                </table>
-                
-            
-            </div>
-             <!--OMテーブル-->
-            <div class="tab-pane fade" id="np" role="tabpanel" aria-labelledby="np-tab">
-                <p>OMで販売されている商品一覧です。1NP=1円換算になります。</p>
-                             <!--OMDBテーブル-->
-                             <table class="table table-hover">
+                                        </td>
+                                        <td>
+                                            <?php echo $result['date']; ?>
+                                        </td>
+                                    </tr>
+                                    <?php } ?>
+
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                        <!--OMテーブル-->
+                        <div class="tab-pane fade" id="np" role="tabpanel" aria-labelledby="np-tab">
+                            <p>OMで販売されている商品一覧です。1NP=1円換算になります。</p>
+                            <!--OMDBテーブル-->
+                            <table class="table table-hover table--hen">
                                 <thead>
                                     <tr>
-                                    <th scope="col">id</th>
-                                    <th scope="col">サーバ名</th>
-                                    <th scope="col">アイテム名</th>
-                                    <th scope="col">価格</th>
-                                    <th scope="col">日付</th>
+                                        
+                                        <th scope="col">サーバ名</th>
+                                        <th scope="col">アイテム名</th>
+                                        <th scope="col">価格</th>
+                                        <th scope="col">日付</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    
                                         <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)){ ?>
-                                            <th scope="row"><?php echo $result['id']; ?></th>
-                                            <td><?php echo $result['server']; ?></td>
-                                            <td><?php echo $result['item']; ?></td>
-                                            <td><?php 
+                                    <tr>    
+                                        <td>
+                                            <?php echo $result['server']; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo $result['item']; ?>
+                                        </td>
+                                        <td>
+                                            <?php 
                                                     if($result['buyspot']=="露店"){
                                                         echo number_format($result['price'])."seed";
                                                     }else{
                                                         echo number_format($result['price'])."NP";
                                                     }
                                                  ?>
-                                            </td>
-                                            <td><?php echo $result['date']; ?></td>
+                                        </td>
+                                        <td>
+                                            <?php echo $result['date']; ?>
+                                        </td>
+                                        </tr>
                                         <?php } ?>
-                                    </tr>
+                                    
                                 </tbody>
-                             </table>   
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </div>
+        <div id="footer">
+            <center>copy right (c) 2018 RJ,水上商会 all rights reserved</center>
+        </div>
+
     </body>
-</html>
+
+    </html>

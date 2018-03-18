@@ -14,7 +14,7 @@
 
         
         if(!empty($_POST['btn_confirm']) ) {
-            $page_flag = 1;
+            //$page_flag = 1;
             
         }elseif( !empty($_POST['btn_submit']) ) {
 
@@ -23,20 +23,51 @@
         }
 
         if(isset($_POST['btn_confirm'])){
-            $_SESSION['server'] =htmlspecialchars($_POST['server'], ENT_QUOTES, "UTF-8");
-            $_SESSION['item'] =htmlspecialchars($_POST['item'], ENT_QUOTES, "UTF-8");
-            $_SESSION['buyspot']=htmlspecialchars($_POST['buyspot'], ENT_QUOTES, "UTF-8");
-            $_SESSION['buyname'] =htmlspecialchars($_POST['buyname'], ENT_QUOTES, "UTF-8");
             
-            //kとm入力に限り0を自動追加
-            if(strpos($_POST['price'],'m') !== false || strpos($_POST['price'],'M') !== false){
-                $_POST['price'] = intval($_POST['price'])*1000*1000;
-            }elseif(strpos($_POST['price'],'k') !== false || strpos($_POST['price'],'K') !== false){
-                $_POST['price'] = intval($_POST['price'])*1000;
+            if ($_POST['server'] !== "▼サーバを選択してください" &&!empty($_POST['item'])&& $_POST['buyspot'] !== "▼売場を選択してください" && !empty($_POST['buyname']) && !empty($_POST['date']) && !empty($_POST['price'])) { 
+                 
+                 $_SESSION['server'] =htmlspecialchars($_POST['server'], ENT_QUOTES, "UTF-8");
+                 $_SESSION['item'] =htmlspecialchars($_POST['item'], ENT_QUOTES, "UTF-8");
+                 $_SESSION['buyspot']=htmlspecialchars($_POST['buyspot'], ENT_QUOTES, "UTF-8");
+                 $_SESSION['buyname'] =htmlspecialchars($_POST['buyname'], ENT_QUOTES, "UTF-8");
+            
+                //kとm入力に限り0を自動追加
+                if(strpos($_POST['price'],'m') !== false || strpos($_POST['price'],'M') !== false){
+                    $_POST['price'] = floatval($_POST['price'])*1000*1000;
+                }elseif(strpos($_POST['price'],'k') !== false || strpos($_POST['price'],'K') !== false){
+                    $_POST['price'] = floatval($_POST['price'])*1000;
+                }
+                $_SESSION['price'] =htmlspecialchars($_POST['price'], ENT_QUOTES, "UTF-8");
+
+                $_SESSION['date'] =htmlspecialchars($_POST['date'], ENT_QUOTES, "UTF-8"); 
+                
+                $page_flag = 1;
+            }else{
+                $page_flag = 0;
+                
+                $_SESSION['server'] =htmlspecialchars($_POST['server'], ENT_QUOTES, "UTF-8");
+                 $_SESSION['item'] =htmlspecialchars($_POST['item'], ENT_QUOTES, "UTF-8");
+                 $_SESSION['buyspot']=htmlspecialchars($_POST['buyspot'], ENT_QUOTES, "UTF-8");
+                 $_SESSION['buyname'] =htmlspecialchars($_POST['buyname'], ENT_QUOTES, "UTF-8");
+            
+                //kとm入力に限り0を自動追加
+                if(strpos($_POST['price'],'m') !== false || strpos($_POST['price'],'M') !== false){
+                    $_POST['price'] = floatval($_POST['price'])*1000*1000;
+                }elseif(strpos($_POST['price'],'k') !== false || strpos($_POST['price'],'K') !== false){
+                    $_POST['price'] = floatval($_POST['price'])*1000;
+                }
+                $_SESSION['price'] =htmlspecialchars($_POST['price'], ENT_QUOTES, "UTF-8");
+
+                $_SESSION['date'] =htmlspecialchars($_POST['date'], ENT_QUOTES, "UTF-8"); 
+                
             }
-            $_SESSION['price'] =htmlspecialchars($_POST['price'], ENT_QUOTES, "UTF-8");
+           
             
-            $_SESSION['date'] =htmlspecialchars($_POST['date'], ENT_QUOTES, "UTF-8");
+            
+           
+            
+            
+            
         }elseif(isset($_POST['btn_submit'])){
             //form登録
             $sql = "INSERT INTO items (item,server,buyspot,buyname,price,date) VALUES (?,?,?,?,?,?)";
@@ -61,6 +92,9 @@
 
             session_destroy();
             
+        }elseif(isset($_POST['btn_cancel'])){
+            header("location:enecan.php");
+            session_destroy();
         }
 
 
@@ -104,7 +138,8 @@ input[type="text"]:forcus{
 
 input[name=btn_confirm],
 input[name=btn_submit],
-input[name=btn_back]{
+input[name=btn_back],
+input[name=btn_cancel]{
 	margin-top: 10px;
 	padding: 5px 20px;
 	font-size: 100%;
@@ -189,7 +224,7 @@ label {
                                 <p><?php echo $_SESSION['date']; ?></p>
                             </div>
                         </div>
-                <div>
+                
                 <input type="submit" class="btn btn-secondary" name="btn_back" value="戻る">
                 <input type="submit" class="btn btn-primary" name="btn_submit" value="登録">
                 
@@ -213,12 +248,15 @@ label {
                         <label for="server" class="col-sm-2 col-form-label">サーバ</label>
                         <div class="col-sm-10">
                             <select id="server" class="form-control" name="server">
+                                <option <?php if( !empty($_SESSION['server']) && $_SESSION['server'] === "▼サーバを選択してください" ){ echo 'selected'; } ?>>▼サーバを選択してください</option>
+                                
                                 <option  <?php if( !empty($_SESSION['server']) && $_SESSION['server'] === "ローゼンバーグ" ){ echo 'selected'; } ?>>ローゼンバーグ</option>
                                 <option  <?php if( !empty($_SESSION['server']) && $_SESSION['server'] === "エルフィンタ" ){ echo 'selected'; } ?>>エルフィンタ</option>
                                 <option  <?php if( !empty($_SESSION['server']) && $_SESSION['server'] === "ミストラル" ){ echo 'selected'; } ?>>ミストラル</option>
                                 <option  <?php if( !empty($_SESSION['server']) && $_SESSION['server'] === "ゼルナ" ){ echo 'selected'; } ?>>ゼルナ</option>
                                 <option  <?php if( !empty($_SESSION['server']) && $_SESSION['server'] === "モエン" ){ echo 'selected'; } ?>>モエン</option>
                             </select>
+                            <?php if($_SESSION['server']==="▼サーバを選択してください" && $_POST['btn_confirm']){echo '<font color="red">*サーバを選択していません</font>';} ?>
                         </div>
                     </div>
                      <!--item -->
@@ -226,6 +264,7 @@ label {
                         <label for="item" class="col-sm-2 col-form-label">アイテム名</label>
                         <div class="col-sm-10">
                         <input type="text" class="form-control" id="item" name="item" value="<?php if( !empty($_SESSION['item']) ){ echo $_SESSION['item']; } ?>" placeholder="正式名称で入力：ゲシュ⇒ゲシュタルトの破片">
+                            <?php if($_SESSION['item']==="" && $_POST['btn_confirm']){echo '<font color="red">*アイテム名が空欄です</font>';} ?>
                         </div>
                     </div>
                     <!-- price -->
@@ -233,6 +272,7 @@ label {
                         <label for="inputPassword" class="col-sm-2 col-form-label">価格</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="price" name="price" value="<?php if( !empty($_SESSION['price']) ){ echo $_SESSION['price']; } ?>" placeholder="価格を半角で入力。kとmと入力しても自動で0を追加します">
+                            <?php if($_SESSION['price']==="" && $_POST['btn_confirm']){echo '<font color="red">*価格が空欄です</font>';} ?>
                         </div>
                     </div>
                     <!-- buyspot  -->
@@ -240,9 +280,11 @@ label {
                         <label for="inputPassword" class="col-sm-2 col-form-label">売場</label>
                         <div class="col-sm-10">
                             <select id="buyspot" class="form-control" name="buyspot">
+                                <option <?php if( !empty($_SESSION['buyspot']) && $_SESSION['buyspot'] === "▼売場を選択してください" ){ echo 'selected'; } ?>>▼売場を選択してください</option>
                                 <option  <?php if( !empty($_SESSION['buyspot']) && $_SESSION['buyspot'] === "露店" ){ echo 'selected'; } ?>>露店</option>
-                                <option  <?php if( !empty($_SESSION['buyspot']) && $_SESSION['buyspot'] === "OM(=TOM)" ){ echo 'selected'; } ?>>OM(=TOM)</option>
+                                <option  <?php if( !empty($_SESSION['buyspot']) && $_SESSION['buyspot'] === "TOM" ){ echo 'selected'; } ?>>TOM</option>
                             </select>
+                            <?php if($_SESSION['buyspot']==="▼売場を選択してください" && $_POST['btn_confirm']){echo '<font color="red">*売場を選択していません</font>';} ?>
                         </div>
                     </div>
                     <!-- buyname  -->
@@ -250,6 +292,7 @@ label {
                         <label for="buyname" class="col-sm-2 col-form-label">販売者名</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="buyname"  name="buyname"  value="<?php if( !empty($_SESSION['buyname']) ){ echo $_SESSION['buyname']; } ?>" placeholder="販売者名をキャラクター名で入力">
+                             <?php if($_SESSION['buyname']==="" && $_POST['btn_confirm']){echo '<font color="red">*販売者名が空欄です</font>';} ?>
                         </div>
                     </div>
                     <!-- date  -->
@@ -257,9 +300,13 @@ label {
                         <label for="date" class="col-sm-2 col-form-label">日付</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="date" name="date"  value="<?php if( !empty($_SESSION['date']) ){ echo $_SESSION['date']; } ?>" placeholder="露店の場合は登録した日付をOMの場合は掲載期限の日付を登録してください">
+                             <?php if($_SESSION['date']==="" && $_POST['btn_confirm']){echo '<font color="red">*日付が空欄です</font>';} ?>
                         </div>
                     </div>
-                    <center><input type="submit" class="btn btn-primary" name="btn_confirm" value="確認する"></center>
+                    <center>
+                        <input type="submit" class="btn btn-secondary" name="btn_cancel" value="TOPページに戻る">
+                        <input type="submit" class="btn btn-primary" name="btn_confirm" value="確認する">
+                    </center>
                 </form> 
         <?php endif; ?>     
 
