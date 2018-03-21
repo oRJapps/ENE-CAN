@@ -6,14 +6,13 @@ session_start();
 
     // データベースの接続
     try {
-        $dbh = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD, $options);
+        $dbh = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8', DB_USER, DB_PASSWORD);
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         echo "状態：アイテム登録ができます";
 
         //テーブル表示用SQL-露店
         
         $sql_roten = 'SELECT * FROM items WHERE buyspot ="露店"';
-        $stmt_roten = $dbh -> query("SET NAMES utf8;");
         $stmt_roten = $dbh -> query($sql_roten);
 
         //テーブル表示用SQL-NP-ALL
@@ -55,7 +54,6 @@ session_start();
                     break;
             }
             $sql_search_r  = sprintf("SELECT * FROM items WHERE item LIKE '%%%s%%' AND buyspot='露店'",$_SESSION['search']);
-            $stmt_search_r = $dbh -> query("SET NAMES utf8;");
             $stmt_search_r=$dbh -> query($sql_search_r);
             
             
@@ -93,7 +91,6 @@ session_start();
             }
             
             $sql_search_n  = sprintf("SELECT * FROM items WHERE item LIKE '%%%s%%' AND buyspot='TOM'",$_SESSION['np-search']);
-            $stmt_search_n = $dbh -> query("SET NAMES utf8;");
             $stmt_search_n=$dbh -> query($sql_search_n);
             
             
@@ -107,6 +104,18 @@ session_start();
     }
 
 
+?>
+
+<?php
+//タブの判定--------------thanks to----------------------------
+function getActiveTabName($post) { 
+    //初期
+    if (empty($post['sear']) && empty($post['np-sear'])) { 
+        return 'stalls'; 
+    } 
+    //どちらかの検索ボタンが押されたら
+    return !empty($post['sear']) ? 'stalls' : 'om';
+} 
 ?>
 
     <!DOCTYPE html>
@@ -155,17 +164,19 @@ session_start();
             <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
                 <!-- 露店タブ -->
                 <li class="nav-item">
-                    <a class="nav-link active" id="seed-tab" data-toggle="tab" href="#seed" role="tab" aria-controls="seed-tab">露店（ゲーム内通貨）</a>
+                    <a class="nav-link <?php echo getActiveTabName($_POST) === 'stalls' ? 'active' : ''; ?>" id="seed-tab" data-toggle="tab" href="#seed" role="tab" aria-controls="seed-tab">露店（ゲーム内通貨）</a>
                 </li>
                 <!--OMタブ -->
                 <li class="nav-item">
-                    <a class="nav-link" id="np-tab" data-toggle="tab" href="#np" role="tab" aria-controls="np-tab">OM（NP=ネクソンポイント）</a>
+                    <a class="nav-link <?php echo getActiveTabName($_POST) === 'om' ? 'active' : ''; ?>" id="np-tab" data-toggle="tab" href="#np" role="tab" aria-controls="np-tab">OM（NP=ネクソンポイント）</a>
                 </li>
             </ul>
+           
+            
             <!-- 露店タブの内容 -->
             <div class="tab-content" id="myTabContent">
 
-                <div class="tab-pane fade show active" id="seed" role="tabpanel" aria-labelledby="seed-tab">
+                <div class="tab-pane fade <?php echo getActiveTabName($_POST) === 'stalls' ? 'active show' : ''; ?>" id="seed" role="tabpanel" aria-labelledby="seed-tab">
 
                     <p>ゲーム内通貨SEEDで販売されているアイテムです。<br> 検索後全件表示をしたい場合は、テキストボックスをクリアにしたのち、検索ボタンを押してください。
                     </p>
@@ -261,36 +272,8 @@ session_start();
                 </div>
 
                 <!-- OMタブの内容 -->
-                <script>
-                    
-                    $("input[name=np-sear]").on('click',function(){
-                        // POSTメソッドで送るデータを定義します var data = {パラメータ名 : 値};
-                        alert("OK")
-                       /* var data = {
-                            "np-search": "input[name=np-search]".val()
-                        }
-                        
-                        $.ajax({
-                            type: "POST",
-                            url: "enecantest.php#np",
-                            data: data,
-                        }).success(function(data) {
-                            // successのブロック内は、Ajax通信が成功した場合に呼び出される
-                            alert('OK')
-                            console.log(data);
-                            $('.tab-pane', '#seed-tab').removeClass('show active')
-                            $('.tab-pane', '#np-tab').addClass('show active')
-                            // PHPから返ってきたデータの表示
-                            $('#np').trigger('click')
-                        });
 
-                        // サブミット後、ページをリロードしないようにする
-                        return false; */
-                    }); 
-
-                </script>
-
-                <div class="tab-pane fade" id="np" role="tabpanel" aria-labelledby="np-tab">
+                <div class="tab-pane fade <?php echo getActiveTabName($_POST) === 'om' ? 'active show' : ''; ?>" id="np" role="tabpanel" aria-labelledby="np-tab">
                     <p>OMで販売されている商品一覧です。1NP=1円換算になります。<br> 検索後全件表示をしたい場合は、テキストボックスをクリアにしたのち、検索ボタンを押してください。
                     </p>
                     <form method="post">
