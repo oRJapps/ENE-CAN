@@ -1,5 +1,8 @@
 <?php
-    require('connect.php');
+    
+require('connect.php');
+
+session_start();
 
     // データベースの接続
     try {
@@ -17,61 +20,84 @@
         
         $sql_np = 'SELECT * FROM items WHERE buyspot ="TOM"';
         $stmt_np = $dbh -> query($sql_np);
-
-       //共通スキル 
-        $sql_sw = 'SELECT * FROM items WHERE item LIKE "%ストロングウェポン%"';
-        $stmt_sw = $dbh -> query("SET NAMES utf8;");
-        $stmt_sw = $dbh -> query($sql_sw);
-
-        $sql_pa = 'SELECT * FROM items WHERE item LIKE "%プロテクトアーマー%"';
-        $stmt_pa = $dbh -> query("SET NAMES utf8;");
-        $stmt_pa = $dbh -> query($sql_pa);
-
-        $sql_eb = 'SELECT * FROM items WHERE item LIKE "%エレメンタルブレイク%"';
-        $stmt_eb = $dbh -> query("SET NAMES utf8;");
-        $stmt_eb = $dbh -> query($sql_eb);
-
-        $sql_ea = 'SELECT * FROM items WHERE item LIKE "%エクストリームアタック%"';
-        $stmt_ea = $dbh -> query("SET NAMES utf8;");
-        $stmt_ea = $dbh -> query($sql_ea);
-
-        $sql_pw = 'SELECT * FROM items WHERE item LIKE "%パワーウェポン%"';
-        $stmt_pw = $dbh -> query("SET NAMES utf8;");
-        $stmt_pw = $dbh -> query($sql_pw);
-
-        $sql_ca = 'SELECT * FROM items WHERE item LIKE "%コートアーマー%"';
-        $stmt_ca = $dbh -> query("SET NAMES utf8;");
-        $stmt_ca = $dbh -> query($sql_ca);
-
-        $sql_ha = 'SELECT * FROM items WHERE item LIKE "%ハイパーアタック%"';
-        $stmt_ha = $dbh -> query("SET NAMES utf8;");
-        $stmt_ha = $dbh -> query($sql_ha);
-
-        $sql_ih = 'SELECT * FROM items WHERE item LIKE "%アイアンハート%"';
-        $stmt_ih = $dbh -> query("SET NAMES utf8;");
-        $stmt_ih = $dbh -> query($sql_ih);
-
-        //二次覚醒素材
-        $sql_geshu = 'SELECT * FROM items WHERE item ="ゲシュタルトの破片"';
-        $stmt_geshu = $dbh -> query("SET NAMES utf8;");
-        $stmt_geshu = $dbh -> query($sql_geshu);
-
-        $sql_hen = 'SELECT * FROM items WHERE item ="変質したコア"';
-        $stmt_hen = $dbh -> query("SET NAMES utf8;");
-        $stmt_hen = $dbh -> query($sql_hen);
-
-        //三次覚醒素材
-        $sql_namida = 'SELECT * FROM items WHERE item ="精霊の涙"';
-        $stmt_namida = $dbh -> query("SET NAMES utf8;");
-        $stmt_namida = $dbh -> query($sql_namida);
-
-        $sql_tamashi = 'SELECT * FROM items WHERE item ="精霊の魂"';
-        $stmt_tamashi = $dbh -> query("SET NAMES utf8;");
-        $stmt_tamashi = $dbh -> query($sql_tamashi);
-
-        $sql_dango = 'SELECT * FROM items WHERE item ="黄金団子"';
-        $stmt_dango = $dbh -> query("SET NAMES utf8;");
-        $stmt_dango = $dbh -> query($sql_dango);
+        
+        //serach
+        if(!empty($_POST['sear'])){
+            $_SESSION['search'] = $_POST['search'];
+            //変換
+            switch($_SESSION['search']){
+                case "SW":
+                    $_SESSION['search']="ストロングウェポン";
+                    break;
+                case "PA":
+                    $_SESSION['search']="プロテクトアーマー";
+                    break;
+                case "EA":
+                    $_SESSION['search']="エクストリームアタック";
+                    break;
+                case "EB":
+                    $_SESSION['search']="エレメンタルブレイク";
+                    break;
+                case "変コア":
+                    $_SESSION['search']="変質したコア";
+                    break;
+                case "PW":
+                    $_SESSION['search']="パワーウェポン";
+                    break;
+                case "CA":
+                    $_SESSION['search']="コートアーマー";
+                    break;
+                case "HA":
+                    $_SESSION['search']="ハイパーアタック";
+                    break;
+                case "IH":
+                   $_SESSION['search']="アイアンハート";
+                    break;
+            }
+            $sql_search_r  = sprintf("SELECT * FROM items WHERE item LIKE '%%%s%%' AND buyspot='露店'",$_SESSION['search']);
+            $stmt_search_r = $dbh -> query("SET NAMES utf8;");
+            $stmt_search_r=$dbh -> query($sql_search_r);
+            
+            
+        }elseif(!empty($_POST['np-sear'])){
+            $_SESSION['np-search'] = $_POST['np-search'];
+            //変換
+            switch($_SESSION['np-search']){
+                case "SW":
+                   $_SESSION['np-search']="ストロングウェポン";
+                    break;
+                case "PA":
+                    $_SESSION['np-search']="プロテクトアーマー";
+                    break;
+                case "EA":
+                    $_SESSION['np-search']="エクストリームアタック";
+                    break;
+                case "EB":
+                    $_SESSION['np-search']="エレメンタルブレイク";
+                    break;
+                case "変コア":
+                    $_SESSION['search']="変質したコア";
+                    break;
+                case "PW":
+                    $_SESSION['np-search']="パワーウェポン";
+                    break;
+                case "CA":
+                    $_SESSION['np-search']="コートアーマー";
+                    break;
+                case "HA":
+                    $_SESSION['np-search']="ハイパーアタック";
+                    break;
+                case "IH":
+                   $_SESSION['np-search']="アイアンハート";
+                    break;
+            }
+            
+            $sql_search_n  = sprintf("SELECT * FROM items WHERE item LIKE '%%%s%%' AND buyspot='TOM'",$_SESSION['np-search']);
+            $stmt_search_n = $dbh -> query("SET NAMES utf8;");
+            $stmt_search_n=$dbh -> query($sql_search_n);
+            
+            
+        }
         
 
 
@@ -81,6 +107,18 @@
     }
 
 
+?>
+
+<?php
+//タブの判定--------------thanks to----------------------------
+function getActiveTabName($post) { 
+    //初期
+    if (empty($post['sear']) && empty($post['np-sear'])) { 
+        return 'stalls'; 
+    } 
+    //どちらかの検索ボタンが押されたら
+    return !empty($post['sear']) ? 'stalls' : 'om';
+} 
 ?>
 
     <!DOCTYPE html>
@@ -95,9 +133,10 @@
     </head>
 
     <body>
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
             <a class="navbar-brand" href="index.html">ENE*CAN</a>
@@ -119,41 +158,70 @@
 
             </div>
         </nav>
+
         <div class="clear">
-            <div class="layerTransparent" >
+            <h1>エネルギッシュな缶詰</h1>
+            <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
+            <p>アイテムがない場合は、<a href="newitem.php">こちら</a>から登録できます。</p>
 
-                <div id="enecan">
-                    <h1>エネルギッシュな缶詰</h1>
-                    <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
-                    <p>アイテムがない場合は、<a href="newitem.php">こちら</a>から登録できます。</p>
+            <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+                <!-- 露店タブ -->
+                <li class="nav-item">
+                    <a class="nav-link <?php echo getActiveTabName($_POST) === 'stalls' ? 'active' : ''; ?>" id="seed-tab" data-toggle="tab" href="#seed" role="tab" aria-controls="seed-tab">露店（ゲーム内通貨）</a>
+                </li>
+                <!--OMタブ -->
+                <li class="nav-item">
+                    <a class="nav-link <?php echo getActiveTabName($_POST) === 'om' ? 'active' : ''; ?>" id="np-tab" data-toggle="tab" href="#np" role="tab" aria-controls="np-tab">OM（NP=ネクソンポイント）</a>
+                </li>
+            </ul>
+           
+            
+            <!-- 露店タブの内容 -->
+            <div class="tab-content" id="myTabContent">
 
-                    <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="seed-tab" data-toggle="tab" href="#seed" role="tab" aria-controls="seed-tab" aria-selected="true">露店（ゲーム内通貨）</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="np-tab" data-toggle="tab" href="#np" role="tab" aria-controls="np-tab" aria-selected="false">OM（NP=ネクソンポイント）</a>
-                        </li>
-                    </ul>
+                <div class="tab-pane fade <?php echo getActiveTabName($_POST) === 'stalls' ? 'active show' : ''; ?>" id="seed" role="tabpanel" aria-labelledby="seed-tab">
 
-                    <div class="tab-content" id="myTabContent">
-                        <!--露店テーブル-->
-                        <div class="tab-pane fade show active" id="seed" role="tabpanel" aria-labelledby="seed-tab">
-                            <p>ゲーム内通貨SEEDで販売されているアイテムです。</p>
-                            <table class="table table-hover table--hen">
-                                <thead>
+                    <p>ゲーム内通貨SEEDで販売されているアイテムです。<br> 検索後全件表示をしたい場合は、テキストボックスをクリアにしたのち、検索ボタンを押してください。
+                    </p>
+                    <form method="post">
+                        <input class="col col-5" type="text" name="search">
+                        <input class="col col-1" id="s" type="submit" value="検索" name="sear">
+                    </form>
+
+
+                    <?php if(isset($_POST['sear'])): ?>
+                    <table class="table table-hover table--hen">
+                        <thead>
+                            <tr>
+                                <th scope="col">サーバ名</th>
+                                <th scope="col">アイテム名</th>
+                                <th scope="col">価格</th>
+                                <th scope="col">日付</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <? if(empty($_POST['search'])): ?>
+
+                                <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)):?>
+                                <tr>
+                                    <td>
+                                        <?php echo $result['server']; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $result['item']; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo number_format($result['price'])."seed"; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $result['date']; ?>
+                                    </td>
+                                </tr>
+                                <?php endwhile; ?>
+
+                                <? else: ?>
+                                    <?php while($result = $stmt_search_r ->fetch(PDO::FETCH_ASSOC)):?>
                                     <tr>
-                                        <th scope="col">サーバ名</th>
-                                        <th scope="col">アイテム名</th>
-                                        <th scope="col">価格</th>
-                                        <th scope="col">日付</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)){ ?>
-                                    <tr>
-                                        
                                         <td>
                                             <?php echo $result['server']; ?>
                                         </td>
@@ -161,73 +229,154 @@
                                             <?php echo $result['item']; ?>
                                         </td>
                                         <td>
-                                            <?php 
-                                    if($result['buyspot']=="露店"){
-                                        echo number_format($result['price'])."seed";
-                                    }else{
-                                        echo number_format($result['price'])."NP";
-                                    }
-                                    ?>
+                                            <?php echo number_format($result['price'])."seed"; ?>
                                         </td>
                                         <td>
                                             <?php echo $result['date']; ?>
                                         </td>
                                     </tr>
-                                    <?php } ?>
+                                    <?php endwhile; ?>
+                                    <? endif; ?>
+                        </tbody>
+                    </table>
+                    <?php else: ?>
+                    <table class="table table-hover table--hen">
+                        <thead>
+                            <tr>
+                                <th scope="col">サーバ名</th>
+                                <th scope="col">アイテム名</th>
+                                <th scope="col">価格</th>
+                                <th scope="col">日付</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)): ?>
+                            <tr>
+                                <td>
+                                    <?php echo $result['server']; ?>
+                                </td>
+                                <td>
+                                    <?php echo $result['item']; ?>
+                                </td>
+                                <td>
+                                    <?php echo number_format($result['price'])."seed"; ?>
+                                </td>
+                                <td>
+                                    <?php echo $result['date']; ?>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
 
-                                </tbody>
-                            </table>
+                    <?php endif; ?>
 
-
-                        </div>
-                        <!--OMテーブル-->
-                        <div class="tab-pane fade" id="np" role="tabpanel" aria-labelledby="np-tab">
-                            <p>OMで販売されている商品一覧です。1NP=1円換算になります。</p>
-                            <!--OMDBテーブル-->
-                            <table class="table table-hover table--hen">
-                                <thead>
-                                    <tr>
-                                        
-                                        <th scope="col">サーバ名</th>
-                                        <th scope="col">アイテム名</th>
-                                        <th scope="col">価格</th>
-                                        <th scope="col">日付</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                        <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)){ ?>
-                                    <tr>    
-                                        <td>
-                                            <?php echo $result['server']; ?>
-                                        </td>
-                                        <td>
-                                            <?php echo $result['item']; ?>
-                                        </td>
-                                        <td>
-                                            <?php 
-                                                    if($result['buyspot']=="露店"){
-                                                        echo number_format($result['price'])."seed";
-                                                    }else{
-                                                        echo number_format($result['price'])."NP";
-                                                    }
-                                                 ?>
-                                        </td>
-                                        <td>
-                                            <?php echo $result['date']; ?>
-                                        </td>
-                                        </tr>
-                                        <?php } ?>
-                                    
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
 
                 </div>
 
+                <!-- OMタブの内容 -->
+
+                <div class="tab-pane fade <?php echo getActiveTabName($_POST) === 'om' ? 'active show' : ''; ?>" id="np" role="tabpanel" aria-labelledby="np-tab">
+                    <p>OMで販売されている商品一覧です。1NP=1円換算になります。<br> 検索後全件表示をしたい場合は、テキストボックスをクリアにしたのち、検索ボタンを押してください。
+                    </p>
+                    <form method="post">
+                        <input class="col col-5" type="text" name="np-search">
+                        <input class="col col-1" id="np-btn" type="submit" value="検索" name="np-sear">
+                    </form>
+                    <!--OMDBテーブル-->
+                    <?php if(isset($_POST['np-sear'])): ?>
+
+                    <table class="table table-hover table--hen" id="np-item">
+                        <thead>
+                            <tr>
+                                <th scope="col">サーバ名</th>
+                                <th scope="col">アイテム名</th>
+                                <th scope="col">価格</th>
+                                <th scope="col">日付</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <? if(empty($_POST['np-search'])): ?>
+
+                                <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)):?>
+                                <tr>
+                                    <td>
+                                        <?php echo $result['server']; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $result['item']; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo number_format($result['price'])."NP"; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $result['date']; ?>
+                                    </td>
+                                </tr>
+                                <?php endwhile; ?>
+
+                                <? else: ?>
+
+                                    <?php while($result = $stmt_search_n ->fetch(PDO::FETCH_ASSOC)):?>
+                                    <tr>
+                                        <td>
+                                            <?php echo $result['server']; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo $result['item']; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo number_format($result['price'])."NP"; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo $result['date']; ?>
+                                        </td>
+                                    </tr>
+                                    <?php endwhile; ?>
+                                    <? endif; ?>
+                        </tbody>
+                    </table>
+
+
+                    <?php else: ?>
+                    <table class="table table-hover table--hen">
+                        <thead>
+                            <tr>
+                                <th scope="col">サーバ名</th>
+                                <th scope="col">アイテム名</th>
+                                <th scope="col">価格</th>
+                                <th scope="col">日付</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)): ?>
+                            <tr>
+                                <td>
+                                    <?php echo $result['server']; ?>
+                                </td>
+                                <td>
+                                    <?php echo $result['item']; ?>
+                                </td>
+                                <td>
+                                    <?php echo number_format($result['price'])."NP"; ?>
+                                </td>
+                                <td>
+                                    <?php echo $result['date']; ?>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+
+                    <?php endif; ?>
+                </div>
+
+
             </div>
+
         </div>
+
+
         <div id="footer">
             <center>copy right (c) 2018 RJ,水上商会 all rights reserved</center>
         </div>
@@ -235,3 +384,8 @@
     </body>
 
     </html>
+    <?php
+$dbh =null;
+session_destroy();
+
+?>
