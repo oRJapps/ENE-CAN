@@ -57,7 +57,7 @@ session_start();
             }
             
             if(isset($_POST['sear'])){
-                $sql_search_r = "SELECT * FROM items WHERE item LIKE (:item) ORDER BY date DESC";
+                $sql_search_r = "SELECT * FROM items WHERE item LIKE (:item) AND buyspot='露店' ORDER BY date DESC";
                 $stmt_search_r=$dbh->prepare($sql_search_r);
                 
                 if($stmt_search_r){
@@ -89,7 +89,7 @@ session_start();
                     $_SESSION['np-search']="エレメンタルブレイク";
                     break;
                 case "変コア":
-                    $_SESSION['search']="変質したコア";
+                    $_SESSION['np-search']="変質したコア";
                     break;
                 case "PW":
                     $_SESSION['np-search']="パワーウェポン";
@@ -111,7 +111,6 @@ session_start();
             
             
         }
-        
 
 
     } catch (PDOException $e) {
@@ -225,13 +224,23 @@ function getActiveTabName($post) {
                             <?php echo $result['server']; ?>
                         </td>
                         <td>
-                            <?php echo $result['item']; ?>
+                        <?php //NEWバッジ追加判定
+                            $today = date("Y-m-d",strtotime("-1 day"));
+                            $currenDay =date("Y-m-d",strtotime($result['date']));
+                            if($currenDay >= $today) {
+                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
+                                
+                            }else{
+                                echo $result['item'];
+                            } 
+                        ?>
+                            
                         </td>
                         <td>
                             <?php echo number_format($result['price'])."seed"; ?>
                         </td>
                         <td>
-                            <?php echo $result['date']; ?>
+                        <?php echo $result['date']; ?>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -243,7 +252,18 @@ function getActiveTabName($post) {
                                 <?php echo $result['server']; ?>
                             </td>
                             <td>
-                                <?php echo $result['item']; ?>
+                            <?php //NEWバッジ追加判定
+                                $today = date("Y-m-d",strtotime("-1 day"));
+                                $currenDay =date("Y-m-d",strtotime($result['date']));
+                            
+                                if($currenDay >= $today) {
+                                    echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
+                                    
+                                }else{
+                                    echo $result['item'];
+                                } 
+                            ?>
+                                
                             </td>
                             <td>
                                 <?php echo number_format($result['price'])."seed"; ?>
@@ -262,7 +282,17 @@ function getActiveTabName($post) {
                             <?php echo $result['server']; ?>
                         </td>
                         <td>
-                            <?php echo $result['item']; ?>
+                            <?php //NEWバッジ追加判定
+                                $today = date("Y-m-d",strtotime("-1 day"));
+                                $currenDay =date("Y-m-d",strtotime($result['date']));
+                                
+                                if($currenDay >= $today) {
+                                    echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
+                                    
+                                }else{
+                                    echo $result['item'];
+                                } 
+                            ?>
                         </td>
                         <td>
                             <?php echo number_format($result['price'])."seed"; ?>
@@ -311,7 +341,17 @@ function getActiveTabName($post) {
                         <?php echo $result['server']; ?>
                     </td>
                     <td>
-                        <?php echo $result['item']; ?>
+                    <?php //NEWバッジ追加判定
+                            $today = date("Y-m-d",strtotime("-1 day"));
+                            $currenDay =date("Y-m-d",strtotime($result['date']));
+                           
+                            if($currenDay >= $today) {
+                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
+                                
+                            }else{
+                                echo $result['item'];
+                            }
+                    ?>
                     </td>
                     <td>
                         <?php echo number_format($result['price'])."NP"; ?>
@@ -329,7 +369,17 @@ function getActiveTabName($post) {
                             <?php echo $result['server']; ?>
                         </td>
                         <td>
-                            <?php echo $result['item']; ?>
+                        <?php //NEWバッジ追加判定
+                            $today = date("Y-m-d",strtotime("-1 day"));
+                            $currenDay =date("Y-m-d",strtotime($result['date']));
+                           
+                            if($currenDay >= $today) {
+                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
+                                
+                            }else{
+                                echo $result['item'];
+                            }
+                        ?>
                         </td>
                         <td>
                             <?php echo number_format($result['price'])."NP"; ?>
@@ -348,13 +398,26 @@ function getActiveTabName($post) {
                             <?php echo $result['server']; ?>
                         </td>
                         <td>
-                            <?php echo $result['item']; ?>
+                        <?php //NEWバッジ追加判定
+                            $today = date("Y-m-d",strtotime("-1 day"));
+                            $currenDay =date("Y-m-d",strtotime($result['date']));
+                           
+                            if($currenDay >= $today) {
+                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
+                                
+                            }else{
+                                echo $result['item'];
+                            }
+                            
+                        ?>
+                            
                         </td>
                         <td>
                             <?php echo number_format($result['price'])."NP"; ?>
                         </td>
                         <td>
-                            <?php echo $result['date']; ?>
+                        <?php echo $result['date']; ?>
+                        
                         </td>
                     </tr>
                 <?php endwhile; ?>
