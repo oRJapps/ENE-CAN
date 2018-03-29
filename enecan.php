@@ -1,6 +1,6 @@
 <?php
     
-require('connect.php');
+require('test/connecttest.php');
 
 session_start();
 
@@ -8,20 +8,40 @@ session_start();
     try {
         $dbh = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8', DB_USER, DB_PASSWORD);
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        echo "状態：アイテム登録ができます";
 
-        //テーブル表示用SQL-露店
-        
-        $sql_roten = 'SELECT * FROM items WHERE buyspot ="露店" ORDER BY date DESC';
-        $stmt_roten = $dbh -> query("SET NAMES utf8;");
-        $stmt_roten = $dbh -> query($sql_roten);
+       //テーブル表示用SQL-露店
+       switch($_POST['sl-server']){
+        case '全サーバ':
+            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" ORDER BY date DESC';
+            break;
+        case 'ローゼンバーグ':
+            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" AND server="ローゼンバーグ" ORDER BY date DESC';
+            break;
+        case 'エルフィンタ':
+            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" AND server="エルフィンタ" ORDER BY date DESC';
+            break;
+        case 'ミストラル':
+            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" AND server="ミストラル" ORDER BY date DESC';
+            break;
+        case 'ゼルナ':
+            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" AND server="ゼルナ" ORDER BY date DESC';
+            break;
+        case 'モエン':
+            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" AND server="モエン" ORDER BY date DESC';
+            break;
+        default:
+            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" ORDER BY date DESC';
+            break;
+    }
+    
+    $stmt_roten = $dbh -> query($sql_roten);
 
         //テーブル表示用SQL-NP-ALL
         
         $sql_np = 'SELECT * FROM items WHERE buyspot ="TOM" ORDER BY date DESC';
         $stmt_np = $dbh -> query($sql_np);
         
-        //serach
+        //search
         if(!empty($_POST['sear'])){
             $_SESSION['search'] = htmlspecialchars($_POST['search'], ENT_QUOTES, "UTF-8");
 
@@ -57,7 +77,7 @@ session_start();
             }
             
             if(isset($_POST['sear'])){
-                $sql_search_r = "SELECT * FROM items WHERE item LIKE (:item) AND buyspot='露店' ORDER BY date DESC";
+                $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND buyspot='露店' ORDER BY date DESC";
                 $stmt_search_r=$dbh->prepare($sql_search_r);
                 
                 if($stmt_search_r){
@@ -199,9 +219,20 @@ function getActiveTabName($post) {
     <p>ゲーム内通貨SEEDで販売されているアイテムです。<br> 検索後全件表示をしたい場合は、テキストボックスをクリアにしたのち、検索ボタンを押してください。
     </p>
     <form method="post" action="enecan.php">
-        <input class="col col-5" type="text" name="search">
-        <input class="col col-1" id="s" type="submit" value="検索" name="sear">
+        <div class="form-group form-inline">
+            <input class="col-5 form-control" type="text" name="search">
+            <select id="server" class="form-control col-2" name="sl-server">
+                <option selected>全サーバ</option>
+                <option>ローゼンバーグ</option>
+                <option>エルフィンタ</option>
+                <option>ミストラル</option>
+                <option>ゼルナ</option>
+                <option>モエン</option>
+            </select>
+            <input  class="btn btn-primary col-1" id="s" type="submit" value="検索" name="sear">
+        </div>
     </form>
+
     
     <table class="table table-hover table--hen">
         <thead>
