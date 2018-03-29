@@ -1,6 +1,6 @@
 <?php
     
-require('test/connecttest.php');
+require('connect.php');
 
 session_start();
 
@@ -10,7 +10,7 @@ session_start();
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
        //テーブル表示用SQL-露店
-       switch($_POST['sl-server']){
+       switch(htmlspecialchars($_POST['sl-server'])){
         case '全サーバ':
             $sql_roten='SELECT * FROM items WHERE buyspot ="露店" ORDER BY date DESC';
             break;
@@ -77,7 +77,29 @@ session_start();
             }
             
             if(isset($_POST['sear'])){
-                $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND buyspot='露店' ORDER BY date DESC";
+                switch(htmlspecialchars($_POST['sl-server'])){
+                    case 'ローゼンバーグ':
+                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ローゼンバーグ') ORDER BY date DESC";
+                        break;
+                    case 'エルフィンタ':
+                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='エルフィンタ') ORDER BY date DESC";
+                        break;
+                    case 'ゼルナ':
+                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ゼルナ') ORDER BY date DESC";
+                        break;
+                    case 'ミストラル':
+                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ミストラル') ORDER BY date DESC";
+                        break;
+                    case 'モエン':
+                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='モエン') ORDER BY date DESC";
+                        break;
+                    default:
+                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND buyspot='露店' ORDER BY date DESC";
+                        break;
+                }
+                
+                
+                
                 $stmt_search_r=$dbh->prepare($sql_search_r);
                 
                 if($stmt_search_r){
@@ -195,7 +217,8 @@ function getActiveTabName($post) {
         <div class="clear">
             <h1>エネルギッシュな缶詰</h1>
             <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
-            <p>アイテムがない場合は、<a href="newitem.php">こちら</a>から登録できます。</p>
+            <p>アイテムがない場合は、<a href="newitem.php">こちら</a>から登録できます。<br>
+            <a href="https://peing.net/ja/wuskkahbrj">アイテムリクエスト</a>も可能になりました！送ると優先して登録されます。</p>
 
             <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
                 <!-- 露店タブ -->
@@ -216,7 +239,9 @@ function getActiveTabName($post) {
 
 <div class="tab-pane fade <?php echo getActiveTabName($_POST) === 'stalls' ? 'active show' : ''; ?>" id="seed" role="tabpanel" aria-labelledby="seed-tab">
 
-    <p>ゲーム内通貨SEEDで販売されているアイテムです。<br> 検索後全件表示をしたい場合は、テキストボックスをクリアにしたのち、検索ボタンを押してください。
+    <p>ゲーム内通貨SEEDで販売されているアイテムです。<br> 
+    検索後全サーバ全件表示をしたい場合は、全サーバを選択しテキストボックスをクリアにしたのち、検索ボタンを押してください。<br>
+    
     </p>
     <form method="post" action="enecan.php">
         <div class="form-group form-inline">
@@ -354,7 +379,6 @@ function getActiveTabName($post) {
     <table class="table table-hover table--hen">
         <thead>
             <tr>
-                <th scope="col">サーバ名</th>
                 <th scope="col">アイテム名</th>
                 <th scope="col">価格</th>
                 <th scope="col">日付</th>
@@ -368,9 +392,6 @@ function getActiveTabName($post) {
 
                 <?php while($result = $stmt_search_n ->fetch(PDO::FETCH_ASSOC)):?>
                 <tr>
-                    <td>
-                        <?php echo $result['server']; ?>
-                    </td>
                     <td>
                     <?php //NEWバッジ追加判定
                             $today = date("Y-m-d",strtotime("-1 day"));
@@ -397,9 +418,6 @@ function getActiveTabName($post) {
                     <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)):?>
                     <tr>
                         <td>
-                            <?php echo $result['server']; ?>
-                        </td>
-                        <td>
                         <?php //NEWバッジ追加判定
                             $today = date("Y-m-d",strtotime("-1 day"));
                             $currenDay =date("Y-m-d",strtotime($result['date']));
@@ -425,9 +443,6 @@ function getActiveTabName($post) {
                 <!--ページアクセス時には全件表示を行う-->
                 <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)):?>
                     <tr>
-                        <td>
-                            <?php echo $result['server']; ?>
-                        </td>
                         <td>
                         <?php //NEWバッジ追加判定
                             $today = date("Y-m-d",strtotime("-1 day"));
