@@ -174,13 +174,25 @@ label {
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         
+        <!-- EnterキーでTOPページに戻るのを防止する -->
+        <script>
+            $(function(){
+                $("input").on("keydown", function(e) {
+                    if ((e.which && e.which === 13) || (e.keyCode && e.keyCode === 13)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                });
+            });
+        </script>
         
         
         <!--登録page-->
 
         <?php if( $page_flag === 1 ): ?>
             <h1>エネルギッシュな缶詰-確認フォーム-</h1>
-            <form method="post" action="">
+            <form method="post" action="newitem.php">
 
             <!--server -->
                 <div class="form-group row">
@@ -242,7 +254,7 @@ label {
             <p><a href="enecan.php">TOPページへ戻る</a> | <a href="newitem.php">続けて登録する</a></p>
         <?php else: ?>
         <h1>エネルギッシュな缶詰-登録フォーム-</h1>
-                <form method="POST">
+                <form method="POST" action="newitem.php">
                     <!--server -->
                     <div class="form-group row">
                         <label for="server" class="col-sm-2 col-form-label">サーバ</label>
@@ -299,15 +311,15 @@ label {
                     <div class="form-group row">
                         <label for="date" class="col-sm-2 col-form-label">日付</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="date" name="date"  value="<?php if( !empty($_SESSION['date']) ){ echo $_SESSION['date']; } ?>" placeholder="露店の場合は登録した日付をOMの場合は掲載期限の日付を登録してください">
+                            <input type="text" class="form-control" id="date" name="date" value="<?php if( !empty($_SESSION['date']) ){ echo $_SESSION['date']; } ?>" placeholder="露店の場合は登録した日付をOMの場合は掲載期限の日付を登録してください">
                              <?php if($_SESSION['date']==="" && $_POST['btn_confirm']){echo '<font color="red">*日付が空欄です</font>';} ?>
                         </div>
                     </div>
                     <center>
                         <input type="submit" class="btn btn-secondary" name="btn_cancel" value="TOPページに戻る">
-                        <input type="submit" class="btn btn-primary" name="btn_confirm" value="確認する">
+                        <input type="submit" class="btn btn-primary" name="btn_confirm"  value="確認する">
                     </center>
-                </form> 
+                </form>
         <?php endif; ?>     
 
     </body>
