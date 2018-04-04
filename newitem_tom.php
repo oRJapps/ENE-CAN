@@ -265,12 +265,7 @@ label {
                     <div class="form-group row">
                         <label for="inputPassword" class="col-sm-2 col-form-label">売場</label>
                         <div class="col-sm-10">
-                            <select id="buyspot" class="form-control" name="buyspot">
-                                <option <?php if( !empty($_SESSION['buyspot']) && $_SESSION['buyspot'] === "▼売場を選択してください" ){ echo 'selected'; } ?>>▼売場を選択してください</option>
-                                <option  <?php if( !empty($_SESSION['buyspot']) && $_SESSION['buyspot'] === "露店" ){ echo 'selected'; } ?>>露店</option>
-                                <option  <?php if( !empty($_SESSION['buyspot']) && $_SESSION['buyspot'] === "TOM" ){ echo 'selected'; } ?>>TOM</option>
-                            </select>
-                            <?php if($_SESSION['buyspot']==="▼売場を選択してください" && $_POST['btn_confirm']){echo '<font color="red">*売場を選択していません</font>';} ?>
+                        <input class="form-control" type="text" name="buyspot" value="TOM" readonly>
                         </div>
                     </div>
                     <!-- buyname  -->
