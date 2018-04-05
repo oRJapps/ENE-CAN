@@ -43,38 +43,11 @@ session_start();
         
         //search
         if(!empty($_POST['sear'])){
+            
             $_SESSION['search'] = htmlspecialchars($_POST['search'], ENT_QUOTES, "UTF-8");
-
-            //変換
-            switch($_SESSION['search']){
-                case "SW":
-                    $_SESSION['search']="ストロングウェポン";
-                    break;
-                case "PA":
-                    $_SESSION['search']="プロテクトアーマー";
-                    break;
-                case "EA":
-                    $_SESSION['search']="エクストリームアタック";
-                    break;
-                case "EB":
-                    $_SESSION['search']="エレメンタルブレイク";
-                    break;
-                case "変コア":
-                    $_SESSION['search']="変質したコア";
-                    break;
-                case "PW":
-                    $_SESSION['search']="パワーウェポン";
-                    break;
-                case "CA":
-                    $_SESSION['search']="コートアーマー";
-                    break;
-                case "HA":
-                    $_SESSION['search']="ハイパーアタック";
-                    break;
-                case "IH":
-                   $_SESSION['search']="アイアンハート";
-                    break;
-            }
+            //略称変換
+            $_SESSION['search'] =ryakushou($_SESSION['search']);
+            
             
             if(isset($_POST['sear'])){
                 switch(htmlspecialchars($_POST['sl-server'])){
@@ -117,35 +90,7 @@ session_start();
             $_SESSION['np-search'] = htmlspecialchars($_POST['np-search'], ENT_QUOTES, "UTF-8");
              
             //変換
-            switch($_SESSION['np-search']){
-                case "SW":
-                   $_SESSION['np-search']="ストロングウェポン";
-                    break;
-                case "PA":
-                    $_SESSION['np-search']="プロテクトアーマー";
-                    break;
-                case "EA":
-                    $_SESSION['np-search']="エクストリームアタック";
-                    break;
-                case "EB":
-                    $_SESSION['np-search']="エレメンタルブレイク";
-                    break;
-                case "変コア":
-                    $_SESSION['np-search']="変質したコア";
-                    break;
-                case "PW":
-                    $_SESSION['np-search']="パワーウェポン";
-                    break;
-                case "CA":
-                    $_SESSION['np-search']="コートアーマー";
-                    break;
-                case "HA":
-                    $_SESSION['np-search']="ハイパーアタック";
-                    break;
-                case "IH":
-                   $_SESSION['np-search']="アイアンハート";
-                    break;
-            }
+            $_SESSION['np-search']=ryakushou($_SESSION['np-search']);
             
             $sql_search_n  = sprintf("SELECT * FROM items WHERE item LIKE '%%%s%%' AND buyspot='TOM' ORDER BY date DESC",$_SESSION['np-search']);
             //$stmt_search_n = $dbh -> query("SET NAMES utf8;");
@@ -161,6 +106,56 @@ session_start();
         exit;
     }
 
+
+?>
+
+<?php
+function ryakushou($str){
+    switch($str){
+        case "SW":
+            $str="ストロングウェポン";
+            break;
+        case "PA":
+            $str="プロテクトアーマー";
+            break;
+        case "EA":
+            $str="エクストリームアタック";
+            break;
+        case "EB":
+            $str="エレメンタルブレイク";
+            break;
+        case "変コア":
+            $str="変質したコア";
+            break;
+        case "PW":
+            $str="パワーウェポン";
+            break;
+        case "CA":
+            $str="コートアーマー";
+            break;
+        case "HA":
+            $str="ハイパーアタック";
+            break;
+        case "IH":
+            $str="アイアンハート";
+            break;
+        case "HS":
+            $str="ハイパースキル";
+            break;
+        case "OS":
+            $str="オーバースキル";
+            break;
+        case "魔石":
+            $str="魔法師の石";
+            break;
+        default:
+
+            break;
+    }
+
+    return $str;
+
+}
 
 ?>
 
@@ -217,7 +212,8 @@ function getActiveTabName($post) {
         <div class="clear">
             <h1>エネルギッシュな缶詰</h1>
             <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
-            <p>アイテムがない場合は、<a href="newitem.php">こちら</a>から登録できます。<br>
+            <p>アイテムがない場合は、登録もできます！なるべく登録してくださると助かります。<br>
+            <p>露店⇒<a href="newitem_roten.php">こちら</a><br>TOM⇒<a href="newitem_tom.php">こちら</a>からお願いします。</p>
             <a href="https://peing.net/ja/wuskkahbrj">アイテムリクエスト</a>も可能になりました！送ると優先して登録されます。</p>
 
             <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
@@ -372,8 +368,10 @@ function getActiveTabName($post) {
     <p>Tales Open Marcket(通称OM)で売られているアイテムです。<br>1NP=1円換算です。<br> 検索後全件表示をしたい場合は、テキストボックスをクリアにしたのち、検索ボタンを押してください。
     </p>
     <form method="post" action="enecan.php">
-        <input class="col col-5" type="text" name="np-search">
-        <input class="col col-1" id="s" type="submit" value="検索" name="np-sear">
+        <div class="form-group form-inline">
+            <input class="col col-5 form-control" type="text" name="np-search">
+            <input class="col col-1 btn btn-primary" id="s" type="submit" value="検索" name="np-sear">
+        </div>
     </form>
     
     <table class="table table-hover table--hen">
