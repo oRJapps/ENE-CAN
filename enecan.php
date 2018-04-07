@@ -8,33 +8,11 @@ session_start();
     try {
         $dbh = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8', DB_USER, DB_PASSWORD);
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
 
        //テーブル表示用SQL-露店
-       switch(htmlspecialchars($_POST['sl-server'])){
-        case '全サーバ':
-            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" ORDER BY date DESC';
-            break;
-        case 'ローゼンバーグ':
-            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" AND server="ローゼンバーグ" ORDER BY date DESC';
-            break;
-        case 'エルフィンタ':
-            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" AND server="エルフィンタ" ORDER BY date DESC';
-            break;
-        case 'ミストラル':
-            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" AND server="ミストラル" ORDER BY date DESC';
-            break;
-        case 'ゼルナ':
-            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" AND server="ゼルナ" ORDER BY date DESC';
-            break;
-        case 'モエン':
-            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" AND server="モエン" ORDER BY date DESC';
-            break;
-        default:
-            $sql_roten='SELECT * FROM items WHERE buyspot ="露店" ORDER BY date DESC';
-            break;
-    }
-    
-    $stmt_roten = $dbh -> query($sql_roten);
+        $sql_roten = server(htmlspecialchars($_POST['sl-server']));
+        $stmt_roten = $dbh -> query($sql_roten);
 
         //テーブル表示用SQL-NP-ALL
         
@@ -50,35 +28,13 @@ session_start();
             
             
             if(isset($_POST['sear'])){
-                switch(htmlspecialchars($_POST['sl-server'])){
-                    case 'ローゼンバーグ':
-                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ローゼンバーグ') ORDER BY date DESC";
-                        break;
-                    case 'エルフィンタ':
-                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='エルフィンタ') ORDER BY date DESC";
-                        break;
-                    case 'ゼルナ':
-                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ゼルナ') ORDER BY date DESC";
-                        break;
-                    case 'ミストラル':
-                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ミストラル') ORDER BY date DESC";
-                        break;
-                    case 'モエン':
-                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='モエン') ORDER BY date DESC";
-                        break;
-                    default:
-                        $sql_search_r ="SELECT * FROM items WHERE item LIKE (:item) AND buyspot='露店' ORDER BY date DESC";
-                        break;
-                }
-                
-                
-                
+                $sql_search_r = server(htmlspecialchars($_POST['sl-server']));
                 $stmt_search_r=$dbh->prepare($sql_search_r);
                 
                 if($stmt_search_r){
                     $item = $_SESSION['search'];
                     $like_search = "%".$item."%";
-                    //プレースホルダへ実際の値を設定する
+                    
                     $stmt_search_r->bindValue(':item', $like_search, PDO::PARAM_STR);
                     $stmt_search_r->execute();
                 }
@@ -93,7 +49,6 @@ session_start();
             $_SESSION['np-search']=ryakushou($_SESSION['np-search']);
             
             $sql_search_n  = sprintf("SELECT * FROM items WHERE item LIKE '%%%s%%' AND buyspot='TOM' ORDER BY date DESC",$_SESSION['np-search']);
-            //$stmt_search_n = $dbh -> query("SET NAMES utf8;");
             $stmt_search_n=$dbh -> query($sql_search_n);
             
             
@@ -110,6 +65,8 @@ session_start();
 ?>
 
 <?php
+//関数
+//アイテム省略⇒正式名称置き換え
 function ryakushou($str){
     switch($str){
         case "SW":
@@ -157,19 +114,74 @@ function ryakushou($str){
 
 }
 
-?>
+//サーバ
+function server($server){
+    switch ($server){
+        case '全サーバ':
+            if(isset($_POST['sear']) && !empty($_SESSION['search'])){
+                $server = "SELECT * FROM items WHERE item LIKE (:item) AND buyspot='露店' ORDER BY date DESC";
+            }else{
+                $server='SELECT * FROM items WHERE buyspot ="露店" ORDER BY date DESC';
+            }
+            break;
+        case 'ローゼンバーグ':
+            if(isset($_POST['sear']) && !empty($_SESSION['search'])){
+                $server = "SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ローゼンバーグ') ORDER BY date DESC";
+            }else {
+                $server = 'SELECT * FROM items WHERE buyspot ="露店" AND server="ローゼンバーグ" ORDER BY date DESC';
+            }
+            break;
+        case 'エルフィンタ':
+            if(isset($_POST['sear']) && !empty($_SESSION['search'])){
+                $server = "SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='エルフィンタ') ORDER BY date DESC";
+            }else{
+                $server='SELECT * FROM items WHERE buyspot ="露店" AND server="エルフィンタ" ORDER BY date DESC';
+            }
 
-<?php
+            break;
+        case 'ミストラル':
+            if(isset($_POST['sear'])&& !empty($_SESSION['search'])){
+                $server ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ミストラル') ORDER BY date DESC";
+            }else{
+                $server='SELECT * FROM items WHERE buyspot ="露店" AND server="ミストラル" ORDER BY date DESC';
+            }
+            break;
+        case 'ゼルナ':
+            if(isset($_POST) && !empty($_SESSION['search'])){
+                $server = "SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ゼルナ') ORDER BY date DESC";
+            }else{
+                $server='SELECT * FROM items WHERE buyspot ="露店" AND server="ゼルナ" ORDER BY date DESC';
+            }
+
+            break;
+        case 'モエン':
+            if(isset($_POST['sear']) && !empty($_SESSION['search'])){
+                $server = "SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='モエン') ORDER BY date DESC";
+            }else{
+                $server='SELECT * FROM items WHERE buyspot ="露店" AND server="モエン" ORDER BY date DESC';
+            }
+
+            break;
+        default:
+            $server='SELECT * FROM items WHERE buyspot ="露店" ORDER BY date DESC';
+            break;
+
+    }
+    return $server;
+}
+
 //タブの判定--------------thanks to----------------------------
-function getActiveTabName($post) { 
+function getActiveTabName($post) {
     //初期
-    if (empty($post['sear']) && empty($post['np-sear'])) { 
-        return 'stalls'; 
-    } 
+    if (empty($post['sear']) && empty($post['np-sear'])) {
+        return 'stalls';
+    }
     //どちらかの検索ボタンが押されたら
     return !empty($post['sear']) ? 'stalls' : 'om';
-} 
+}
+
 ?>
+
 
     <!DOCTYPE html>
     <html>
@@ -237,7 +249,7 @@ function getActiveTabName($post) {
 
     <p>ゲーム内通貨SEEDで販売されているアイテムです。<br> 
     検索後全サーバ全件表示をしたい場合は、全サーバを選択しテキストボックスをクリアにしたのち、検索ボタンを押してください。<br>
-    
+    <?php echo $roten_page ?>
     </p>
     <form method="post" action="enecan.php">
         <div class="form-group form-inline">
