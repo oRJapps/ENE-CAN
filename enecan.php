@@ -8,9 +8,25 @@ session_start();
     try {
         $dbh = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8', DB_USER, DB_PASSWORD);
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
 
-       //テーブル表示用SQL-露店
+        //全件
+        $all = $dbh->prepare("SELECT COUNT(*) FROM items");
+        $all -> execute();
+        $all = $all->fetchColumn();
+
+        // 露店全件数取得
+        $roten_all = $dbh->prepare("SELECT COUNT(*) FROM items WHERE buyspot='露店'");
+        $roten_all -> execute();
+        $roten_all = $roten_all->fetchColumn();
+
+        //TOM全件数取得
+        $tom_all = $dbh->prepare("SELECT COUNT(*) FROM items WHERE buyspot='TOM'");
+        $tom_all -> execute();
+        $tom_all = $tom_all->fetchColumn();
+
+
+
+        //テーブル表示用SQL-露店
         $sql_roten = server(htmlspecialchars($_POST['sl-server']));
         $stmt_roten = $dbh -> query($sql_roten);
 
@@ -194,7 +210,7 @@ function getActiveTabName($post) {
 
     </head>
 
-    <body>
+    <body style="padding-top: 30px;">
         <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -223,6 +239,7 @@ function getActiveTabName($post) {
 
         <div class="clear">
             <h1>エネルギッシュな缶詰</h1>
+            <?php echo '<h4><span class="badge badge-pill badge-danger">アイテム登録数</span>' .$all."件</h4>" ?>
             <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
             <p>アイテムがない場合は、登録もできます！なるべく登録してくださると助かります。<br>
             <p>露店⇒<a href="newitem_roten.php">こちら</a><br>TOM⇒<a href="newitem_tom.php">こちら</a>からお願いします。</p>
@@ -245,247 +262,251 @@ function getActiveTabName($post) {
             <!-- 露店タブの内容 -->
             <div class="tab-content">
 
-<div class="tab-pane fade <?php echo getActiveTabName($_POST) === 'stalls' ? 'active show' : ''; ?>" id="seed" role="tabpanel" aria-labelledby="seed-tab">
+                <div class="tab-pane fade <?php echo getActiveTabName($_POST) === 'stalls' ? 'active show' : ''; ?>" id="seed" role="tabpanel" aria-labelledby="seed-tab">
 
-    <p>ゲーム内通貨SEEDで販売されているアイテムです。<br> 
-    検索後全サーバ全件表示をしたい場合は、全サーバを選択しテキストボックスをクリアにしたのち、検索ボタンを押してください。<br>
-    <?php echo $roten_page ?>
-    </p>
-    <form method="post" action="enecan.php">
-        <div class="form-group form-inline">
-            <input class="col-5 form-control" type="text" name="search">
-            <select id="server" class="form-control col-2" name="sl-server">
-                <option selected>全サーバ</option>
-                <option>ローゼンバーグ</option>
-                <option>エルフィンタ</option>
-                <option>ミストラル</option>
-                <option>ゼルナ</option>
-                <option>モエン</option>
-            </select>
-            <input  class="btn btn-primary col-1" id="s" type="submit" value="検索" name="sear">
-        </div>
-    </form>
 
-    
-    <table class="table table-hover table--hen">
-        <thead>
-            <tr>
-                <th scope="col">サーバ名</th>
-                <th scope="col">アイテム名</th>
-                <th scope="col">価格</th>
-                <th scope="col">日付</th>
-            </tr>
-        </thead>
-        <tbody>
-        <!-- 検索ボタンを押したときの処理 -->
-        <?php if(isset($_POST['sear'])): ?>
-            <!-- テキストボックスが空白じゃない場合、テキストボックスのキーワードを元にSQL文を実行する -->
-            <?php if(!empty($_SESSION['search'])): ?>
+                    <?php echo '<h5><span class="badge badge-pill badge-info">露店アイテム登録数</span>' .$roten_all."件</h5>" ?>
 
-                <?php while($result = $stmt_search_r ->fetch(PDO::FETCH_ASSOC)):?>
-                    <tr>
-                        <td>
-                            <?php echo $result['server']; ?>
-                        </td>
-                        <td>
-                        <?php //NEWバッジ追加判定
-                            $today = date("Y-m-d",strtotime("-1 day"));
-                            $currenDay =date("Y-m-d",strtotime($result['date']));
-                            if($currenDay >= $today) {
-                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
-                                
-                            }else{
-                                echo $result['item'];
-                            } 
-                        ?>
-                            
-                        </td>
-                        <td>
-                            <?php echo number_format($result['price'])."seed"; ?>
-                        </td>
-                        <td>
-                        <?php echo $result['date']; ?>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-                <!-- テキストボックスが空欄の場合、販売箇所が露店箇所を全件表示 -->
-            <?php elseif(empty($_SESSION['search'])): ?>
-                <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)):?>
-                        <tr>
-                            <td>
-                                <?php echo $result['server']; ?>
-                            </td>
-                            <td>
-                            <?php //NEWバッジ追加判定
-                                $today = date("Y-m-d",strtotime("-1 day"));
-                                $currenDay =date("Y-m-d",strtotime($result['date']));
-                            
-                                if($currenDay >= $today) {
-                                    echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
-                                    
-                                }else{
-                                    echo $result['item'];
-                                } 
-                            ?>
-                                
-                            </td>
-                            <td>
-                                <?php echo number_format($result['price'])."seed"; ?>
-                            </td>
-                            <td>
-                                <?php echo $result['date']; ?>
-                            </td>
-                        </tr>
-                <?php endwhile; ?>
-            <?php endif; ?>
-        <?php else: ?>
-                <!--ページアクセス時には全件表示を行う-->
-                <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)):?>
-                    <tr>
-                        <td>
-                            <?php echo $result['server']; ?>
-                        </td>
-                        <td>
-                            <?php //NEWバッジ追加判定
-                                $today = date("Y-m-d",strtotime("-1 day"));
-                                $currenDay =date("Y-m-d",strtotime($result['date']));
-                                
-                                if($currenDay >= $today) {
-                                    echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
-                                    
-                                }else{
-                                    echo $result['item'];
-                                } 
-                            ?>
-                        </td>
-                        <td>
-                            <?php echo number_format($result['price'])."seed"; ?>
-                        </td>
-                        <td>
-                            <?php echo $result['date']; ?>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-            
-        <?php endif; ?>
-        </tbody>
-    </table>
+                    <form method="post" action="enecan.php">
+                        <div class="form-group form-inline">
+                            <input class="col-5 form-control" type="text" name="search">
+                            <select id="server" class="form-control col-2" name="sl-server">
+                                <option selected>全サーバ</option>
+                                <option>ローゼンバーグ</option>
+                                <option>エルフィンタ</option>
+                                <option>ミストラル</option>
+                                <option>ゼルナ</option>
+                                <option>モエン</option>
+                            </select>
+                            <input class="btn btn-primary col-1" id="s" type="submit" value="検索" name="sear">
+                        </div>
+                    </form>
+                    <p>ゲーム内通貨SEEDで販売されているアイテムです。<br>
+                        検索後全サーバ全件表示をしたい場合は、全サーバを選択しテキストボックスをクリアにしたのち、検索ボタンを押してください。<br>
+                    </p>
 
-</div>
+                    <table class="table table-hover table--hen">
+                        <thead>
+                            <tr>
+                                <th scope="col">サーバ名</th>
+                                <th scope="col">アイテム名</th>
+                                <th scope="col">価格</th>
+                                <th scope="col">日付</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <!-- 検索ボタンを押したときの処理 -->
+                        <?php if(isset($_POST['sear'])): ?>
+                            <!-- テキストボックスが空白じゃない場合、テキストボックスのキーワードを元にSQL文を実行する -->
+                            <?php if(!empty($_SESSION['search'])): ?>
 
-<!-- OMタブの内容 -->
+                                <?php while($result = $stmt_search_r ->fetch(PDO::FETCH_ASSOC)):?>
+                                    <tr>
+                                        <td>
+                                            <?php echo $result['server']; ?>
+                                        </td>
+                                        <td>
+                                        <?php //NEWバッジ追加判定
+                                            $today = date("Y-m-d",strtotime("-1 day"));
+                                            $currenDay =date("Y-m-d",strtotime($result['date']));
+                                            if($currenDay >= $today) {
+                                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
 
-<div class="tab-pane fade <?php echo getActiveTabName($_POST) === 'om' ? 'active show' : ''; ?>" id="np" role="tabpanel" aria-labelledby="np-tab">
+                                            }else{
+                                                echo $result['item'];
+                                            }
+                                        ?>
 
-    <p>Tales Open Marcket(通称OM)で売られているアイテムです。<br>1NP=1円換算です。<br> 検索後全件表示をしたい場合は、テキストボックスをクリアにしたのち、検索ボタンを押してください。
-    </p>
-    <form method="post" action="enecan.php">
-        <div class="form-group form-inline">
-            <input class="col col-5 form-control" type="text" name="np-search">
-            <input class="col col-1 btn btn-primary" id="s" type="submit" value="検索" name="np-sear">
-        </div>
-    </form>
-    
-    <table class="table table-hover table--hen">
-        <thead>
-            <tr>
-                <th scope="col">アイテム名</th>
-                <th scope="col">価格</th>
-                <th scope="col">日付</th>
-            </tr>
-        </thead>
-        <tbody>
-        <!-- 検索ボタンを押したときの処理 -->
-        <?php if(isset($_POST['np-sear'])): ?>
-            <!-- テキストボックスが空白じゃない場合、テキストボックスのキーワードを元にSQL文を実行する -->
-            <?php if(!empty($_SESSION['np-search'])): ?>
+                                        </td>
+                                        <td>
+                                            <?php echo number_format($result['price'])."seed"; ?>
+                                        </td>
+                                        <td>
+                                        <?php echo $result['date']; ?>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                                <!-- テキストボックスが空欄の場合、販売箇所が露店箇所を全件表示 -->
+                            <?php elseif(empty($_SESSION['search'])): ?>
+                                <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)):?>
+                                        <tr>
+                                            <td>
+                                                <?php echo $result['server']; ?>
+                                            </td>
+                                            <td>
+                                            <?php //NEWバッジ追加判定
+                                                $today = date("Y-m-d",strtotime("-1 day"));
+                                                $currenDay =date("Y-m-d",strtotime($result['date']));
 
-                <?php while($result = $stmt_search_n ->fetch(PDO::FETCH_ASSOC)):?>
-                <tr>
-                    <td>
-                    <?php //NEWバッジ追加判定
-                            $today = date("Y-m-d",strtotime("-1 day"));
-                            $currenDay =date("Y-m-d",strtotime($result['date']));
-                           
-                            if($currenDay >= $today) {
-                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
-                                
-                            }else{
-                                echo $result['item'];
-                            }
-                    ?>
-                    </td>
-                    <td>
-                        <?php echo number_format($result['price'])."NP"; ?>
-                    </td>
-                    <td>
-                        <?php echo $result['date']; ?>
-                    </td>
-                </tr>
-                <?php endwhile; ?>
-                <!-- テキストボックスが空欄の場合、販売箇所が露店箇所を全件表示 -->
-            <?php elseif(empty($_SESSION['np-search'])): ?>
-                    <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)):?>
-                    <tr>
-                        <td>
-                        <?php //NEWバッジ追加判定
-                            $today = date("Y-m-d",strtotime("-1 day"));
-                            $currenDay =date("Y-m-d",strtotime($result['date']));
-                           
-                            if($currenDay >= $today) {
-                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
-                                
-                            }else{
-                                echo $result['item'];
-                            }
-                        ?>
-                        </td>
-                        <td>
-                            <?php echo number_format($result['price'])."NP"; ?>
-                        </td>
-                        <td>
-                            <?php echo $result['date']; ?>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-            <?php endif; ?>
-        <?php else: ?>
-                <!--ページアクセス時には全件表示を行う-->
-                <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)):?>
-                    <tr>
-                        <td>
-                        <?php //NEWバッジ追加判定
-                            $today = date("Y-m-d",strtotime("-1 day"));
-                            $currenDay =date("Y-m-d",strtotime($result['date']));
-                           
-                            if($currenDay >= $today) {
-                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
-                                
-                            }else{
-                                echo $result['item'];
-                            }
-                            
-                        ?>
-                            
-                        </td>
-                        <td>
-                            <?php echo number_format($result['price'])."NP"; ?>
-                        </td>
-                        <td>
-                        <?php echo $result['date']; ?>
-                        
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-            
-        <?php endif; ?>
-        </tbody>
-    </table>
+                                                if($currenDay >= $today) {
+                                                    echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
 
-</div>
-</div>
-</div>
-</div>
+                                                }else{
+                                                    echo $result['item'];
+                                                }
+                                            ?>
+
+                                            </td>
+                                            <td>
+                                                <?php echo number_format($result['price'])."seed"; ?>
+                                            </td>
+                                            <td>
+                                                <?php echo $result['date']; ?>
+                                            </td>
+                                        </tr>
+                                <?php endwhile; ?>
+                            <?php endif; ?>
+                        <?php else: ?>
+                                <!--ページアクセス時には全件表示を行う-->
+                                <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)):?>
+                                    <tr>
+                                        <td>
+                                            <?php echo $result['server']; ?>
+                                        </td>
+                                        <td>
+                                            <?php //NEWバッジ追加判定
+                                                $today = date("Y-m-d",strtotime("-1 day"));
+                                                $currenDay =date("Y-m-d",strtotime($result['date']));
+
+                                                if($currenDay >= $today) {
+                                                    echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
+
+                                                }else{
+                                                    echo $result['item'];
+                                                }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php echo number_format($result['price'])."seed"; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo $result['date']; ?>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+
+                        <?php endif; ?>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <!-- OMタブの内容 -->
+
+                <div class="tab-pane fade <?php echo getActiveTabName($_POST) === 'om' ? 'active show' : ''; ?>" id="np" role="tabpanel" aria-labelledby="np-tab">
+                    <?php echo '<h5><span class="badge badge-pill badge-info">TOMアイテム登録数</span>' .$tom_all."件</h5>" ?>
+
+
+                    <form method="post" action="enecan.php">
+                        <div class="form-group form-inline">
+                            <input class="col col-5 form-control" type="text" name="np-search">
+                            <input class="col col-1 btn btn-primary" id="s" type="submit" value="検索" name="np-sear">
+                        </div>
+                    </form>
+
+                    <p>Tales Open Marcket(通称OM)で売られているアイテムです。<br>1NP=1円換算です。<br> 検索後全件表示をしたい場合は、テキストボックスをクリアにしたのち、検索ボタンを押してください。
+                    </p>
+
+                    <table class="table table-hover table--hen">
+                        <thead>
+                            <tr>
+                                <th scope="col">アイテム名</th>
+                                <th scope="col">価格</th>
+                                <th scope="col">日付</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <!-- 検索ボタンを押したときの処理 -->
+                        <?php if(isset($_POST['np-sear'])): ?>
+                            <!-- テキストボックスが空白じゃない場合、テキストボックスのキーワードを元にSQL文を実行する -->
+                            <?php if(!empty($_SESSION['np-search'])): ?>
+
+                                <?php while($result = $stmt_search_n ->fetch(PDO::FETCH_ASSOC)):?>
+                                <tr>
+                                    <td>
+                                    <?php //NEWバッジ追加判定
+                                            $today = date("Y-m-d",strtotime("-1 day"));
+                                            $currenDay =date("Y-m-d",strtotime($result['date']));
+
+                                            if($currenDay >= $today) {
+                                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
+
+                                            }else{
+                                                echo $result['item'];
+                                            }
+                                    ?>
+                                    </td>
+                                    <td>
+                                        <?php echo number_format($result['price'])."NP"; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $result['date']; ?>
+                                    </td>
+                                </tr>
+                                <?php endwhile; ?>
+                                <!-- テキストボックスが空欄の場合、販売箇所が露店箇所を全件表示 -->
+                            <?php elseif(empty($_SESSION['np-search'])): ?>
+                                    <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)):?>
+                                    <tr>
+                                        <td>
+                                        <?php //NEWバッジ追加判定
+                                            $today = date("Y-m-d",strtotime("-1 day"));
+                                            $currenDay =date("Y-m-d",strtotime($result['date']));
+
+                                            if($currenDay >= $today) {
+                                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
+
+                                            }else{
+                                                echo $result['item'];
+                                            }
+                                        ?>
+                                        </td>
+                                        <td>
+                                            <?php echo number_format($result['price'])."NP"; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo $result['date']; ?>
+                                        </td>
+                                    </tr>
+                                    <?php endwhile; ?>
+                            <?php endif; ?>
+                        <?php else: ?>
+                                <!--ページアクセス時には全件表示を行う-->
+                                <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)):?>
+                                    <tr>
+                                        <td>
+                                        <?php //NEWバッジ追加判定
+                                            $today = date("Y-m-d",strtotime("-1 day"));
+                                            $currenDay =date("Y-m-d",strtotime($result['date']));
+
+                                            if($currenDay >= $today) {
+                                                echo '<span class="badge badge-danger">' . 'NEW' . '</span> '.$result['item'];
+
+                                            }else{
+                                                echo $result['item'];
+                                            }
+
+                                        ?>
+
+                                        </td>
+                                        <td>
+                                            <?php echo number_format($result['price'])."NP"; ?>
+                                        </td>
+                                        <td>
+                                        <?php echo $result['date']; ?>
+
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+
+                        <?php endif; ?>
+                        </tbody>
+                    </table>
+
+                </div>
+                </div>
+                </div>
+                </div>
 
 
         <div id="footer">
