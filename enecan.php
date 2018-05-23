@@ -1,7 +1,7 @@
 <?php
-
-require('test/connecttest.php');
 session_start();
+require('connect.php');
+
 // データベースの接続
 try {
     $dbh = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8', DB_USER, DB_PASSWORD);
@@ -45,15 +45,6 @@ try {
                 $stmt_search_r->bindValue(':item', $like_search, PDO::PARAM_STR);
                 $stmt_search_r->execute();
 
-                //登録
-                if(!empty($item)){
-                    $keyword_sql = "INSERT INTO keywords (keyword) VALUES (?)";
-                    $stmt_keyword = $dbh -> query("SET NAMES utf8;");
-                    $stmt_keyword = $dbh ->prepare($keyword_sql);
-                    $stmt_keyword->bindValue(1, $item, PDO::PARAM_STR);
-                    $stmt_keyword->execute();
-                    $item ="";
-                }
 
             }
         }
@@ -73,14 +64,7 @@ try {
         $stmt_search_n->bindValue(':item', $like_search_n, PDO::PARAM_STR);
         $stmt_search_n->execute();
 
-        if(!empty($item_n)){
-            $keyword_sql_n = "INSERT INTO keywords (keyword) VALUES (?)";
-            $stmt_keyword_n = $dbh -> query("SET NAMES utf8;");
-            $stmt_keyword_n = $dbh ->prepare($keyword_sql_n);
-            $stmt_keyword_n->bindValue(1, $item_n, PDO::PARAM_STR);
-            $stmt_keyword_n->execute();
-            $item_n ="";
-        }
+
 
 
     }
@@ -134,6 +118,10 @@ function ryakushou($str){
             break;
         case "赤土":
             $str="アカド";
+            break;
+        case "ブニクル":
+            $str="ブリニクル";
+            break;
         default:
             break;
     }
@@ -211,6 +199,8 @@ function getActiveTabName($post) {
         <meta charset="utf-8">
         <link rel="stylesheet" href="./css/style.css">
         <link type="text/css" rel="stylesheet" href="js/PaginateMyTable.css" />
+        <link type="text/css" rel="stylesheet" href="css/bootstrap-social.css" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
     </head>
 
@@ -247,6 +237,15 @@ function getActiveTabName($post) {
                 </li>
 
             </ul>
+            <?php if(!empty($_SESSION['screen_name'])): ?>
+                <a href="logout.php">ログアウト</a>
+            <img src="<?php echo $_SESSION['profile_image_url_https']; ?>">
+            <?php else: ?>
+                <a class="btn btn-block btn-social btn-twitter" href="login.php" style="width: 30%">
+                    <i class="fab fa-twitter-square"></i>
+                    Sign in with Twitter
+                </a>
+            <?php endif; ?>
 
         </div>
     </nav>
@@ -258,8 +257,7 @@ function getActiveTabName($post) {
         <p>アイテムがない場合は、登録もできます！なるべく登録してくださると助かります。<br>
         <p>露店⇒<a href="newitem_roten.php">こちら</a><br>TOM⇒<a href="newitem_tom.php">こちら</a>からお願いします。</p>
         <a href="https://peing.net/ja/wuskkahbrj">アイテムリクエスト</a>も可能になりました！送ると優先して登録されます。</p>
-        <p style="color:red;">4月17日から5月17日まで、通知機能実装の検索ワードをデータベースに登録致します。<br>
-        登録されたデータベースは、通知アイテムの設定に使われます。<br>ご協力よろしくおねがいしますm(_ _)m<br></p>
+
 
         <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
             <!-- 露店タブ -->
@@ -522,5 +520,4 @@ function getActiveTabName($post) {
     </html>
 <?php
 $dbh =null;
-session_destroy();
 ?>
