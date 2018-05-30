@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 require('connect.php');
 
 // データベースの接続
@@ -72,6 +73,20 @@ try {
     echo $e->getMessage();
     echo "状況：登録できません。";
     exit;
+}
+?>
+<?php
+function ua_smt (){
+//ユーザーエージェントを取得
+$ua = $_SERVER['HTTP_USER_AGENT'];
+//スマホと判定する文字リスト
+$ua_list = array('iPhone','iPad','iPod','Android');
+ foreach ($ua_list as $ua_smt) {
+//ユーザーエージェントに文字リストの単語を含む場合はTRUE、それ以外はFALSE
+  if (strpos($ua, $ua_smt) !== false) {
+   return true;
+  }
+ } return false;
 }
 ?>
 
@@ -195,28 +210,44 @@ function getActiveTabName($post) {
 
     <head>
         <title>エネルギッシュな缶詰</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <meta charset="utf-8">
-        <link rel="stylesheet" href="./css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link type="text/css" rel="stylesheet" href="css/style.css?20180528" />
         <link type="text/css" rel="stylesheet" href="js/PaginateMyTable.css" />
         <link type="text/css" rel="stylesheet" href="css/bootstrap-social.css" />
+        <link type="text/css" rel="stylesheet" href="css/table.css?20180528" />
+
+
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-119882133-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'UA-119882133-1');
+        </script>
 
     </head>
 
     <body style="padding-top: 30px;">
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     <script src="js/PaginateMyTable.js"></script>
     <script>
         $(document).ready(function() {
             $(".MyTable").paginate({
-               rows:50
+               rows:100
             });
         });
 
     </script>
+
 
 
 
@@ -238,8 +269,33 @@ function getActiveTabName($post) {
 
             </ul>
             <?php if(!empty($_SESSION['screen_name'])): ?>
-                <a href="logout.php">ログアウト</a>
-            <img src="<?php echo $_SESSION['profile_image_url_https']; ?>">
+                <?php var_dump($_COOKIE['twitter']); ?>
+                <a href="#" data-toggle="popover" data-placement="bottom" data-toggle="popover" title="メニュー">
+                    <img src="<?php echo $_SESSION['profile_image_url_https']; ?>">
+                </a>
+
+
+
+
+                <!-- ログアウトクリック時ポップオーバーでメニュー通知 -->
+                <script>
+                    $(document).ready(function() {
+                        $('[data-toggle="popover"]').popover({
+                            html: true,
+                            content: function() {
+                                return $('#popover-content').html();
+                            }
+                        });
+                    });
+                </script>
+                    <div id="popover-content" style="display: none;">
+                        <ul class="list-group">
+                            <li class="list-group-item">設定</li>
+                            <li class="list-group-item"><a href="logout.php">ログアウト</a></li>
+                        </ul>
+                    </div>
+
+
             <?php else: ?>
                 <a class="btn btn-block btn-social btn-twitter" href="login.php" style="width: 30%">
                     <i class="fab fa-twitter-square"></i>
@@ -248,16 +304,31 @@ function getActiveTabName($post) {
             <?php endif; ?>
 
         </div>
+
     </nav>
+    <div style="padding-top:50px;">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <?php if($_SESSION['oauth_token']){
+                echo "Twitterでログイン中!ログアウトは↑メニュー↑からできるよ";
+            }else{
+                echo "Twitterでログインしてないよ。拡張機能を利用したいときはログインしてね";
+            } ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+    <div class="container-fluid">
 
-    <div class="clear">
-        <h1>エネルギッシュな缶詰</h1>
-        <?php echo '<h4><span class="badge badge-pill badge-danger">アイテム登録数</span>' .$all."件</h4>" ?>
-        <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
-        <p>アイテムがない場合は、登録もできます！なるべく登録してくださると助かります。<br>
-        <p>露店⇒<a href="newitem_roten.php">こちら</a><br>TOM⇒<a href="newitem_tom.php">こちら</a>からお願いします。</p>
-        <a href="https://peing.net/ja/wuskkahbrj">アイテムリクエスト</a>も可能になりました！送ると優先して登録されます。</p>
 
+        <div class="jumbotron">
+            <h1>エネルギッシュな缶詰</h1>
+            <?php echo '<h4><span class="badge badge-pill badge-danger">アイテム登録数</span>' .$all."件</h4>" ?>
+            <p>露店からNPまでいつでも気になるアイテムの相場が即確認できます。</p>
+            <p>アイテムがない場合は、登録もできます！なるべく登録してくださると助かります。<br>
+            <p>露店⇒<a href="newitem_roten.php">こちら</a><br>TOM⇒<a href="newitem_tom.php">こちら</a>からお願いします。</p>
+            <a href="https://peing.net/ja/wuskkahbrj">アイテムリクエスト</a>も可能になりました！送ると優先して登録されます。</p>
+        </div>
 
         <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
             <!-- 露店タブ -->
@@ -283,8 +354,8 @@ function getActiveTabName($post) {
 
                 <form method="post" action="enecan.php">
                     <div class="form-group form-inline">
-                        <input class="col-5 form-control" type="text" name="search">
-                        <select id="server" class="form-control col-2" name="sl-server">
+                        <input class="col-xs-12 col-md-5 form-control" type="text" name="search">
+                        <select id="server" class="form-control col-xs-12 col-md-4" name="sl-server">
                             <option selected>全サーバ</option>
                             <option>ローゼンバーグ</option>
                             <option>エルフィンタ</option>
@@ -292,20 +363,28 @@ function getActiveTabName($post) {
                             <option>ゼルナ</option>
                             <option>モエン</option>
                         </select>
-                        <input class="btn btn-primary col-1" id="s" type="submit" value="検索" name="sear">
+                        <input class="btn btn-primary col-xs-12 col-md-3" id="s" style="width: 100%" type="submit" value ="検索"  name="sear">
                     </div>
                 </form>
                 <p>ゲーム内通貨SEEDで販売されているアイテムです。<br>
                     検索後全サーバ全件表示をしたい場合は、全サーバを選択しテキストボックスをクリアにしたのち、検索ボタンを押してください。<br>
                 </p>
 
-                <table class="table table-hover table--hen MyTable">
+                <table class="table table-hover table-bordered table01 MyTable">
                     <thead>
                     <tr>
                         <th scope="col">サーバ名</th>
                         <th scope="col">アイテム名</th>
-                        <th scope="col">価格</th>
-                        <th scope="col">日付</th>
+                        <th data-breakpoints="xs sm md" scope="col">価格</th>
+                        <?php if(!empty($_SESSION['oauth_token'])): ?>
+                            <th data-breakpoints="xs sm md" scope="col">販売者名</th>
+                        <?php else: ?>
+                            <?php
+                            strip_tags("<th scope='col'>");
+                            strip_tags("</th>");
+                            ?>
+                        <?php endif; ?>
+                        <th data-breakpoints="xs sm md" scope="col">日付</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -315,11 +394,11 @@ function getActiveTabName($post) {
                         <?php if(!empty($_SESSION['search'])): ?>
 
                             <?php while($result = $stmt_search_r ->fetch(PDO::FETCH_ASSOC)):?>
-                                <tr>
-                                    <td>
+                                <tr data-expanded="false">
+                                    <td aria-label="サーバ名">
                                         <?php echo $result['server']; ?>
                                     </td>
-                                    <td>
+                                    <td aria-label="アイテム名">
                                         <?php //NEWバッジ追加判定
                                         $today = date("Y-m-d",strtotime("-1 day"));
                                         $currenDay =date("Y-m-d",strtotime($result['date']));
@@ -331,10 +410,20 @@ function getActiveTabName($post) {
                                         ?>
 
                                     </td>
-                                    <td>
+                                    <td aria-label="価格">
                                         <?php echo number_format($result['price'])."seed"; ?>
                                     </td>
-                                    <td>
+                                    <?php if(!empty($_SESSION['oauth_token'])): ?>
+                                        <td aria-label="販売者名">
+                                            <?php echo $result['buyname']; ?>
+                                        </td>
+                                    <?php else: ?>
+                                        <?php
+                                        strip_tags("<td>");
+                                        strip_tags("</td>");
+                                        ?>
+                                    <?php endif; ?>
+                                    <td aria-label="日付">
                                         <?php echo $result['date']; ?>
                                     </td>
                                 </tr>
@@ -342,11 +431,11 @@ function getActiveTabName($post) {
                             <!-- テキストボックスが空欄の場合、販売箇所が露店箇所を全件表示 -->
                         <?php elseif(empty($_SESSION['search'])): ?>
                             <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)):?>
-                                <tr>
-                                    <td>
+                                <tr data-expanded="false">
+                                    <td aria-label="サーバ名">
                                         <?php echo $result['server']; ?>
                                     </td>
-                                    <td>
+                                    <td aria-label="アイテム名">
                                         <?php //NEWバッジ追加判定
                                         $today = date("Y-m-d",strtotime("-1 day"));
                                         $currenDay =date("Y-m-d",strtotime($result['date']));
@@ -358,10 +447,20 @@ function getActiveTabName($post) {
                                         ?>
 
                                     </td>
-                                    <td>
+                                    <td aria-label="価格">
                                         <?php echo number_format($result['price'])."seed"; ?>
                                     </td>
-                                    <td>
+                                    <?php if(!empty($_SESSION['oauth_token'])): ?>
+                                        <td aria-label="販売者名">
+                                            <?php echo $result['buyname']; ?>
+                                        </td>
+                                    <?php else: ?>
+                                        <?php
+                                        strip_tags("<td>");
+                                        strip_tags("</td>");
+                                        ?>
+                                    <?php endif; ?>
+                                    <td aria-label="日付">
                                         <?php echo $result['date']; ?>
                                     </td>
                                 </tr>
@@ -371,10 +470,10 @@ function getActiveTabName($post) {
                         <!--ページアクセス時には全件表示を行う-->
                         <?php while($result = $stmt_roten ->fetch(PDO::FETCH_ASSOC)):?>
                             <tr>
-                                <td>
+                                <td aria-label="サーバ名">
                                     <?php echo $result['server']; ?>
                                 </td>
-                                <td>
+                                <td aria-label="アイテム名">
                                     <?php //NEWバッジ追加判定
                                     $today = date("Y-m-d",strtotime("-1 day"));
                                     $currenDay =date("Y-m-d",strtotime($result['date']));
@@ -384,11 +483,22 @@ function getActiveTabName($post) {
                                         echo $result['item'];
                                     }
                                     ?>
+
                                 </td>
-                                <td>
+                                <td aria-label="価格">
                                     <?php echo number_format($result['price'])."seed"; ?>
                                 </td>
-                                <td>
+                                <?php if(!empty($_SESSION['oauth_token'])): ?>
+                                    <td aria-label="販売者名">
+                                        <?php echo $result['buyname']; ?>
+                                    </td>
+                                <?php else: ?>
+                                    <?php
+                                    strip_tags("<td>");
+                                    strip_tags("</td>");
+                                    ?>
+                                <?php endif; ?>
+                                <td aria-label="日付">
                                     <?php echo $result['date']; ?>
                                 </td>
                             </tr>
@@ -408,20 +518,28 @@ function getActiveTabName($post) {
 
                 <form method="post" action="enecan.php">
                     <div class="form-group form-inline">
-                        <input class="col col-5 form-control" type="text" name="np-search">
-                        <input class="col col-1 btn btn-primary" id="s" type="submit" value="検索" name="np-sear">
+                        <input class="col-xs-12 col-md-5 form-control" type="text" name="np-search">
+                        <input class="col col-xs-12 col-md-3 btn btn-primary" id="s" type="submit" value="検索" name="np-sear">
                     </div>
                 </form>
 
                 <p>Tales Open Marcket(通称OM)で売られているアイテムです。<br>1NP=1円換算です。<br> 検索後全件表示をしたい場合は、テキストボックスをクリアにしたのち、検索ボタンを押してください。
                 </p>
 
-                <table class="table table-hover table--hen MyTable">
+                <table class="table table01 table-hover table-bordered MyTable">
                     <thead>
                     <tr>
                         <th scope="col">アイテム名</th>
-                        <th scope="col">価格</th>
-                        <th scope="col">日付</th>
+                        <th data-breakpoints="xs" scope="col">価格</th>
+                        <?php if(!empty($_SESSION['oauth_token'])): ?>
+                            <th data-breakpoints="xs sm md" scope="col">販売者名</th>
+                        <?php else: ?>
+                            <?php
+                            strip_tags("<th scope='col'>");
+                            strip_tags("</th>");
+                            ?>
+                        <?php endif; ?>
+                        <th data-breakpoints="xs sm md" scope="col">日付</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -432,7 +550,7 @@ function getActiveTabName($post) {
 
                             <?php while($result = $stmt_search_n ->fetch(PDO::FETCH_ASSOC)):?>
                                 <tr>
-                                    <td>
+                                    <td aria-label="アイテム名">
                                         <?php //NEWバッジ追加判定
                                         $today = date("Y-m-d",strtotime("-1 day"));
                                         $currenDay =date("Y-m-d",strtotime($result['date']));
@@ -443,10 +561,20 @@ function getActiveTabName($post) {
                                         }
                                         ?>
                                     </td>
-                                    <td>
+                                    <td aria-label="価格">
                                         <?php echo number_format($result['price'])."NP"; ?>
                                     </td>
-                                    <td>
+                                    <?php if(!empty($_SESSION['oauth_token'])): ?>
+                                        <td aria-label="販売者名">
+                                            <?php echo $result['buyname']; ?>
+                                        </td>
+                                    <?php else: ?>
+                                        <?php
+                                        strip_tags("<td>");
+                                        strip_tags("</td>");
+                                        ?>
+                                    <?php endif; ?>
+                                    <td aria-label="日付">
                                         <?php echo $result['date']; ?>
                                     </td>
                                 </tr>
@@ -455,7 +583,7 @@ function getActiveTabName($post) {
                         <?php elseif(empty($_SESSION['np-search'])): ?>
                             <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)):?>
                                 <tr>
-                                    <td>
+                                    <td aria-label="アイテム名">
                                         <?php //NEWバッジ追加判定
                                         $today = date("Y-m-d",strtotime("-1 day"));
                                         $currenDay =date("Y-m-d",strtotime($result['date']));
@@ -466,10 +594,20 @@ function getActiveTabName($post) {
                                         }
                                         ?>
                                     </td>
-                                    <td>
+                                    <td aria-label="価格">
                                         <?php echo number_format($result['price'])."NP"; ?>
                                     </td>
-                                    <td>
+                                    <?php if(!empty($_SESSION['oauth_token'])): ?>
+                                        <td aria-label="販売者名">
+                                            <?php echo $result['buyname']; ?>
+                                        </td>
+                                    <?php else: ?>
+                                        <?php
+                                        strip_tags("<td>");
+                                        strip_tags("</td>");
+                                        ?>
+                                    <?php endif; ?>
+                                    <td aria-label="日付">
                                         <?php echo $result['date']; ?>
                                     </td>
                                 </tr>
@@ -479,7 +617,7 @@ function getActiveTabName($post) {
                         <!--ページアクセス時には全件表示を行う-->
                         <?php while($result = $stmt_np ->fetch(PDO::FETCH_ASSOC)):?>
                             <tr>
-                                <td>
+                                <td aria-label="アイテム名">
                                     <?php //NEWバッジ追加判定
                                     $today = date("Y-m-d",strtotime("-1 day"));
                                     $currenDay =date("Y-m-d",strtotime($result['date']));
@@ -491,10 +629,20 @@ function getActiveTabName($post) {
                                     ?>
 
                                 </td>
-                                <td>
+                                <td aria-label="価格">
                                     <?php echo number_format($result['price'])."NP"; ?>
                                 </td>
-                                <td>
+                                <?php if(!empty($_SESSION['oauth_token'])): ?>
+                                    <td aria-label="販売者名">
+                                        <?php echo $result['buyname']; ?>
+                                    </td>
+                                <?php else: ?>
+                                    <?php
+                                    strip_tags("<td>");
+                                    strip_tags("</td>");
+                                    ?>
+                                <?php endif; ?>
+                                <td aria-label="日付">
                                     <?php echo $result['date']; ?>
 
                                 </td>
@@ -510,6 +658,12 @@ function getActiveTabName($post) {
     </div>
 
 
+    </div>
+
+
+
+
+
 
     <div id="footer">
         <center>copy right (c) 2018 RJ,水上商会 all rights reserved</center>
@@ -519,5 +673,8 @@ function getActiveTabName($post) {
 
     </html>
 <?php
+$_SESSION['search']="";
+$_SESSION['np-search']="";
+//session_destroy();
 $dbh =null;
 ?>
