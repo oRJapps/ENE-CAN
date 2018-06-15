@@ -2,6 +2,7 @@
 session_start();
 
 require('connect.php');
+require_once ('function.php');
 
 // データベースの接続
 try {
@@ -75,134 +76,7 @@ try {
     exit;
 }
 ?>
-<?php
-function ua_smt (){
-//ユーザーエージェントを取得
-$ua = $_SERVER['HTTP_USER_AGENT'];
-//スマホと判定する文字リスト
-$ua_list = array('iPhone','iPad','iPod','Android');
- foreach ($ua_list as $ua_smt) {
-//ユーザーエージェントに文字リストの単語を含む場合はTRUE、それ以外はFALSE
-  if (strpos($ua, $ua_smt) !== false) {
-   return true;
-  }
- } return false;
-}
-?>
 
-<?php
-//関数
-//アイテム省略⇒正式名称置き換え
-function ryakushou($str){
-    switch($str){
-        case "SW":
-            $str="ストロングウェポン";
-            break;
-        case "PA":
-            $str="プロテクトアーマー";
-            break;
-        case "EA":
-            $str="エクストリームアタック";
-            break;
-        case "EB":
-            $str="エレメンタルブレイク";
-            break;
-        case "変コア":
-            $str="変質したコア";
-            break;
-        case "PW":
-            $str="パワーウェポン";
-            break;
-        case "CA":
-            $str="コートアーマー";
-            break;
-        case "HA":
-            $str="ハイパーアタック";
-            break;
-        case "IH":
-            $str="アイアンハート";
-            break;
-        case "HS":
-            $str="ハイパースキル";
-            break;
-        case "OS":
-            $str="オーバースキル";
-            break;
-        case "魔石":
-            $str="魔法師の石";
-            break;
-        case "赤土":
-            $str="アカド";
-            break;
-        case "ブニクル":
-            $str="ブリニクル";
-            break;
-        default:
-            break;
-    }
-    return $str;
-}
-//サーバ
-function server($server){
-    switch ($server){
-        case '全サーバ':
-            if(isset($_POST['sear']) && !empty($_SESSION['search'])){
-                $server = "SELECT * FROM items WHERE item LIKE (:item) AND buyspot='露店' ORDER BY date DESC";
-            }else{
-                $server='SELECT * FROM items WHERE buyspot ="露店" ORDER BY date DESC';
-            }
-            break;
-        case 'ローゼンバーグ':
-            if(isset($_POST['sear']) && !empty($_SESSION['search'])){
-                $server = "SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ローゼンバーグ') ORDER BY date DESC";
-            }else {
-                $server = 'SELECT * FROM items WHERE buyspot ="露店" AND server="ローゼンバーグ" ORDER BY date DESC';
-            }
-            break;
-        case 'エルフィンタ':
-            if(isset($_POST['sear']) && !empty($_SESSION['search'])){
-                $server = "SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='エルフィンタ') ORDER BY date DESC";
-            }else{
-                $server='SELECT * FROM items WHERE buyspot ="露店" AND server="エルフィンタ" ORDER BY date DESC';
-            }
-            break;
-        case 'ミストラル':
-            if(isset($_POST['sear'])&& !empty($_SESSION['search'])){
-                $server ="SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ミストラル') ORDER BY date DESC";
-            }else{
-                $server='SELECT * FROM items WHERE buyspot ="露店" AND server="ミストラル" ORDER BY date DESC';
-            }
-            break;
-        case 'ゼルナ':
-            if(isset($_POST) && !empty($_SESSION['search'])){
-                $server = "SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='ゼルナ') ORDER BY date DESC";
-            }else{
-                $server='SELECT * FROM items WHERE buyspot ="露店" AND server="ゼルナ" ORDER BY date DESC';
-            }
-            break;
-        case 'モエン':
-            if(isset($_POST['sear']) && !empty($_SESSION['search'])){
-                $server = "SELECT * FROM items WHERE item LIKE (:item) AND (buyspot='露店' AND server='モエン') ORDER BY date DESC";
-            }else{
-                $server='SELECT * FROM items WHERE buyspot ="露店" AND server="モエン" ORDER BY date DESC';
-            }
-            break;
-        default:
-            $server='SELECT * FROM items WHERE buyspot ="露店" ORDER BY date DESC';
-            break;
-    }
-    return $server;
-}
-//タブの判定--------------thanks to----------------------------
-function getActiveTabName($post) {
-    //初期
-    if (empty($post['sear']) && empty($post['np-sear'])) {
-        return 'stalls';
-    }
-    //どちらかの検索ボタンが押されたら
-    return !empty($post['sear']) ? 'stalls' : 'om';
-}
-?>
 
 
     <!DOCTYPE html>
@@ -269,15 +143,12 @@ function getActiveTabName($post) {
 
             </ul>
             <?php if(!empty($_SESSION['screen_name'])): ?>
-                <?php var_dump($_COOKIE['twitter']); ?>
                 <a href="#" data-toggle="popover" data-placement="bottom" data-toggle="popover" title="メニュー">
                     <img src="<?php echo $_SESSION['profile_image_url_https']; ?>">
                 </a>
 
 
-
-
-                <!-- ログアウトクリック時ポップオーバーでメニュー通知 -->
+                <!-- プロフィール画像クリック時ポップオーバーでメニュー通知 -->
                 <script>
                     $(document).ready(function() {
                         $('[data-toggle="popover"]').popover({
@@ -290,7 +161,7 @@ function getActiveTabName($post) {
                 </script>
                     <div id="popover-content" style="display: none;">
                         <ul class="list-group">
-                            <li class="list-group-item">設定</li>
+                            <li class="list-group-item"><a href="mypage.php">設定</a></li>
                             <li class="list-group-item"><a href="logout.php">ログアウト</a></li>
                         </ul>
                     </div>
@@ -307,11 +178,12 @@ function getActiveTabName($post) {
 
     </nav>
     <div style="padding-top:50px;">
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <?php if($_SESSION['oauth_token']){
-                echo "Twitterでログイン中!ログアウトは↑メニュー↑からできるよ";
+        <div class="alert alert-danger" role="alert">
+
+            <?php  if($_SESSION['oauth_token']){
+                echo "Twitterでログイン中!";
             }else{
-                echo "Twitterでログインしてないよ。拡張機能を利用したいときはログインしてね";
+                echo "Twitterでログインしていません。";
             } ?>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -374,6 +246,7 @@ function getActiveTabName($post) {
                     <thead>
                     <tr>
                         <th scope="col">サーバ名</th>
+                        <th scope="col">NEXT UPDATE</th>
                         <th scope="col">アイテム名</th>
                         <th data-breakpoints="xs sm md" scope="col">価格</th>
                         <?php if(!empty($_SESSION['oauth_token'])): ?>
@@ -397,6 +270,9 @@ function getActiveTabName($post) {
                                 <tr data-expanded="false">
                                     <td aria-label="サーバ名">
                                         <?php echo $result['server']; ?>
+                                    </td>
+                                    <td>
+                                        Coming Soon...
                                     </td>
                                     <td aria-label="アイテム名">
                                         <?php //NEWバッジ追加判定
@@ -435,6 +311,9 @@ function getActiveTabName($post) {
                                     <td aria-label="サーバ名">
                                         <?php echo $result['server']; ?>
                                     </td>
+                                    <td>
+                                        Coming Soon...
+                                    </td>
                                     <td aria-label="アイテム名">
                                         <?php //NEWバッジ追加判定
                                         $today = date("Y-m-d",strtotime("-1 day"));
@@ -472,6 +351,9 @@ function getActiveTabName($post) {
                             <tr>
                                 <td aria-label="サーバ名">
                                     <?php echo $result['server']; ?>
+                                </td>
+                                <td>
+                                    Coming Soon...
                                 </td>
                                 <td aria-label="アイテム名">
                                     <?php //NEWバッジ追加判定
@@ -656,14 +538,6 @@ function getActiveTabName($post) {
             </div>
         </div>
     </div>
-
-
-    </div>
-
-
-
-
-
 
     <div id="footer">
         <center>copy right (c) 2018 RJ,水上商会 all rights reserved</center>
